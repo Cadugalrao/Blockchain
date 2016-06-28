@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="js_aux/bignumber.js"></script>
+
+<!--link rel="stylesheet" href="js_aux/style.css">
+<link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:300,500' rel='stylesheet' type='text/css'>
+<script src="js_aux/config.js"></script>
+</head>
+<body color bgcolor="#ccfff2">
+<div id="wrapper" style="display:inline-block;">
+<h1>Collateral Management</h1>
+<h2><b>Blockchain</b></h2>
+<br>
+<br>
+<br>
+<center>
+<select id="banco" style="width: 200px; heigth: 80px;">
+   <option value="bancoa" selected>BANCO A</option>
+   <option value="bancob">BANCO B</option>
+   <option value="bancoc">BANCO C</option>
+   <option value="bancod">BANCO D</option>
+</select>
+
+<input type="button" value="OK" onclick="CallPage()" style="width: 150px; heigth: 80px;" />
+</center>
+</div-->
+<script type="text/javascript">
+BigNumber.config({ ERRORS: false })
+var a = BigNumber('33333333333333333333333333333333333333333333', 10);
+var b = a.toString(10);
+//var b = a.random(44);
+var t = b.toString();
+//alert(t.slice(2));
+alert(t);
+
+function CallPage(){
+	var bancosel = document.getElementById("banco").value;
+	var vpage = config[0].URL_Web + bancosel + ".html";
+	//alert (bancosel);
+	//alert (vpage);
+	window.location.href = vpage;
+}
+</script>
+</body>
+</html>

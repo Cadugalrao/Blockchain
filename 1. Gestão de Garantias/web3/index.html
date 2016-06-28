@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gest&atilde;o de Garantias</title>
+	<script src="js_aux/web3.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+	<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+	<script>
+		$(document).bind('mobileinit',function(){
+			$.mobile.changePage.defaults.changeHash = false;
+			$.mobile.hashListeningEnabled = false;
+			$.mobile.pushStateEnabled = false;
+		});
+	</script> 
+	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+	
+	<script src="js_aux/jquery.number.js"></script>
+	<script src="js_aux/debug.js"></script>
+	<script src="js_aux/config.js"></script>
+	<script src="js_aux/utils.js"></script>
+	<link rel="stylesheet" href="js_aux/style.css">
+</head>
+<body color bgcolor="#ccfff2">
+
+<div id="login">
+<h1>Collateral Management</h1>
+<h2><b>Blockchain</b></h2>
+<span>&nbsp;</span>
+	<table>
+	<tr><td>Usu&aacute;rio:</td><td><input id="usuario" /></td></tr>
+	<tr><td>Senha:</td><td><input id="senha" type="password" /></td></tr>
+	</table>
+	<button id="entrar_btn" style="background:#00cc99; cursor: hand;" onclick="entrar()">Entrar</button>
+</div>
+
+<div id="master-container" style="display:none;">
+<h1>Collateral Management</h1>
+<h2><b>Blockchain</b></h2>
+<span>&nbsp;</span>
+<select id="banco">
+   <option value="bancoa" selected>BANCO A</option>
+   <option value="bancob">BANCO B</option>
+   <option value="bancoc">BANCO C</option>
+   <option value="bancod">BANCO D</option>
+</select> 
+
+<input type="button" value="OK" onclick="CallPage()" />
+</div>
+<script type="text/javascript">
+function CallPage(){
+	var bancosel = document.getElementById("banco").value;
+	var vpage = config[0].URL_Web + bancosel + ".html";
+	//alert (bancosel);
+	//alert (vpage);
+	window.location.href = vpage;
+}
+</script>
+</body>
+</html>

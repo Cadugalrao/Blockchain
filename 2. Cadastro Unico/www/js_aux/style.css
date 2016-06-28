@@ -1,0 +1,44 @@
+
+div[id^="permissao"] {
+	padding:0px;
+}
+
+.mensagem_sucesso {
+  padding:3px;
+  font-size:1em;
+  min-height: 60px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  border-bottom: 1px solid #ccc;
+  background: #4FFF86;
+  z-index: 900;
+  display: none;
+}
+.mensagem_erro {
+  padding:3px;
+  font-size:1em;
+  min-height: 60px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  border-bottom: 1px solid #ccc;
+  background: #FF453E;
+  z-index: 900;
+  display: none;
+}
+.mensagem_alerta {
+  padding:3px;
+  font-size:1em;
+  min-height: 60px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  border-bottom: 1px solid #ccc;
+  background: #FFCE83;
+  z-index: 900;
+  display: none;
+}

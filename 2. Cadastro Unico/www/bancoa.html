@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CadU - Cadastro &Uacute;nico</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="js_aux/debug.js"></script>
+    <script src="js_aux/config.js"></script>
+    <script src="js_aux/web3.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <link rel="stylesheet" href="js_aux/style.css">
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script>
+        $(document).bind('mobileinit', function(){
+            $.mobile.changePage.defaults.changeHash = false;
+            $.mobile.hashListeningEnabled = false;
+            $.mobile.pushStateEnabled = false;
+            $.mobile.loader.prototype.options.text = "loading";
+            $.mobile.loader.prototype.options.textVisible = false;
+            $.mobile.loader.prototype.options.theme = "a";
+            $.mobile.loader.prototype.options.html = "";
+        });
+    </script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script type="text/javascript">
+        var conta = "";
+        var numero_banco = 0;
+        var Web3 = require('web3');
+        var web3_node;
+
+        $( document ).ready(function() {
+            main();
+        });
+    </script>
+    <script src="js_aux/utils.js"></script>
+</head>
+<body>
+
+<div data-role="page" id="login">
+    <div data-role="main" class="ui-content">
+        <form method="get">
+            <fieldset class="ui-field-contain">
+                <label for="conta">Selecione uma conta</label>
+                <select name="conta" id="conta">
+                    <option value="1|0x3f6b843f2b8b6ea4ec2c18aa8fae5a92bff02079">Conta 1</option>
+                    <option value="2|0x361f832d63bf0f756161bf744aa7a4eaad5c8328">Conta 2</option>
+                    <option value="3|0x0b697fd49ad5e2a30dc1e970e8db1b9d0a1c25b4">Conta 3</option>
+                    <option value="4|0x3c513bb978ab6c4ae7c5f25b61a839332842410d">Conta 4</option>
+                </select>
+            </fieldset>
+            <input type="button" id="entrar_conta" data-inline="true" value="Entrar">
+        </form>
+    </div>
+
+    <!--div data-role="footer">
+      <h1>My Footer</h1>
+  </div-->
+</div>
+
+<div data-role="page" id="meus_dados">
+    <div data-role="header">
+      <!--h1>Welcome To My Homepage</h1-->
+      <div data-role="navbar">
+        <ul>
+            <li><a href="#meus_dados" data-transition="fade" data-icon="bars" id="btn_meus_dados">Meus Dados</a></li>
+            <li><a href="#permissoes" data-transition="fade" data-icon="lock" id="btn_permissoes">Permiss&otilde;es</a></li>
+            <li><a href="#consultas" data-transition="fade" data-icon="search" id="btn_consultas">Consultas</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div data-role="main" class="ui-content">
+      <p>Meus Dados:</p>
+      <div class="ui-grid-b">
+        <div class="ui-block-a">
+          <a href="#cad_Geral" class="ui-btn ui-corner-all ui-shadow ui-icon-search ui-btn-icon-top ui-btn-icon-notext">Geral</a><br>
+        </div>
+        <div class="ui-block-b">
+          <a href="#cad_Documentos" class="ui-btn ui-corner-all ui-shadow ui-icon-search ui-btn-icon-top ui-btn-icon-notext">Documentos</a><br>
+        </div>
+        <div class="ui-block-c">
+          <a href="#cad_Bens" class="ui-btn ui-corner-all ui-shadow ui-icon-search ui-btn-icon-top ui-btn-icon-notext">Bens</a><br>
+        </div>
+      </div>
+      <div class="ui-grid-b">
+        <div class="ui-block-a">
+          <a href="#cad_Facebook" class="ui-btn ui-corner-all ui-shadow ui-icon-search ui-btn-icon-top ui-btn-icon-notext">Facebook</a><br>
+        </div>
+        <div class="ui-block-b">
+          <a href="#cad_" class="ui-btn ui-corner-all ui-shadow ui-icon-search ui-btn-icon-top ui-btn-icon-notext">&nbsp;</a><br>
+        </div>
+        <div class="ui-block-c">
+          <a href="#cad_" class="ui-btn ui-corner-all ui-shadow ui-icon-search ui-btn-icon-top ui-btn-icon-notext">&nbsp;</a><br>
+        </div>
+      </div>
+    </div>
+
+    <!--div data-role="footer">
+      <h1>My Footer</h1>
+  </div-->
+</div>
+
+
+<div data-role="page" id="cad_Geral">
+    <div data-role="header">
+      <!--h1>Welcome To My Homepage</h1-->
+      <div data-role="navbar">
+        <ul>
+            <li><a href="#meus_dados" data-transition="fade" data-icon="arrow-l" id="btn_meus_dados">Voltar</a></li>
+            <li><a href="#permissoes" data-transition="fade" data-icon="lock" id="btn_permissoes">Permiss&otilde;es</a></li>
+            <li><a href="#consultas" data-transition="fade" data-icon="search" id="btn_consultas">Consultas</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div data-role="main" class="ui-content">
+        <label for="nome">Nome:</label>
+        <input type="text" name="nome" id="nome" maxlength="32">
+        <label for="d_niver">Data de nascimento:</label>
+        <input type="date" name="d_niver" id="d_niver">
+        <label for="switch">Tornar publico:</label>
+        <select name="switch_garal" id="switch_garal" data-role="flipswitch"><option selected="selected" value="false">N&atilde;o</option><option value="true">Sim</option></select>
+
+        <div>
+            <input type="button" id="cadastrar_geral" data-inline="true" value="Entrar">
+        </div>
+    </div>
+
+    <!--div data-role="footer">
+      <h1>My Footer</h1>
+  </div-->
+</div>
+
+<div data-role="page" id="permissoes">
+    <div data-role="header">
+      <!--h1>Welcome To My Homepage</h1-->
+      <div data-role="navbar">
+        <ul>
+            <li><a href="#meus_dados" data-transition="fade" data-icon="bars" id="btn_meus_dados">Meus Dados</a></li>
+            <li><a href="#permissoes" data-transition="fade" data-icon="lock" id="btn_permissoes">Permiss&otilde;es</a></li>
+            <li><a href="#consultas" data-transition="fade" data-icon="search" id="btn_consultas">Consultas</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div data-role="main" class="ui-content">
+        <p>Permissoes</p>
+        <div data-role="collapsible">
+            <h3>Geral</h3>
+            <fieldset class="ui-field-contain">
+                <label for="conta">Selecione uma conta para liber&aacute;-la</label>
+                <div class="ui-grid-a">
+                    <div class="ui-block-a">
+                        <select name="conta" id="conta" data-mini="true">
+                            <option value="1|0x3f6b843f2b8b6ea4ec2c18aa8fae5a92bff02079">Conta 1</option>
+                            <option value="2|0x361f832d63bf0f756161bf744aa7a4eaad5c8328">Conta 2</option>
+                            <option value="3|0x0b697fd49ad5e2a30dc1e970e8db1b9d0a1c25b4">Conta 3</option>
+                            <option value="4|0x3c513bb978ab6c4ae7c5f25b61a839332842410d">Conta 4</option>
+                        </select>
+                    </div>
+                    <div class="ui-block-b">
+                        <input type="button" id="cadastrar_permissao" data-inline="true" value="Permitir" data-mini="true">
+                    </div>
+                </div>
+            </fieldset>
+            <div id="permissao_1" class="ui-content"></div>
+        </div>
+        <div data-role="collapsible">
+            <h3>Documentos</h3>
+            <label for="conta">Selecione uma conta para liber&aacute;-la</label>
+            <div class="ui-grid-a">
+                <div class="ui-block-a">
+                        <select name="conta" id="conta" data-mini="true">
+                            <option value="1|0x3f6b843f2b8b6ea4ec2c18aa8fae5a92bff02079">Conta 1</option>
+                            <option value="2|0x361f832d63bf0f756161bf744aa7a4eaad5c8328">Conta 2</option>
+                            <option value="3|0x0b697fd49ad5e2a30dc1e970e8db1b9d0a1c25b4">Conta 3</option>
+                            <option value="4|0x3c513bb978ab6c4ae7c5f25b61a839332842410d">Conta 4</option>
+                        </select>
+                </div>
+                <div class="ui-block-b">
+                    <input type="button" id="cadastrar_permissao" data-inline="true" value="Permitir" data-mini="true">
+                </div>
+            </div>
+            <div id="permissao_2" class="ui-content"></div>
+        </div>
+        <div data-role="collapsible">
+            <h3>Bens</h3>
+            <label for="conta">Selecione uma conta para liber&aacute;-la</label>
+            <div class="ui-grid-a">
+                <div class="ui-block-a">
+                        <select name="conta" id="conta" data-mini="true">
+                            <option value="1|0x3f6b843f2b8b6ea4ec2c18aa8fae5a92bff02079">Conta 1</option>
+                            <option value="2|0x361f832d63bf0f756161bf744aa7a4eaad5c8328">Conta 2</option>
+                            <option value="3|0x0b697fd49ad5e2a30dc1e970e8db1b9d0a1c25b4">Conta 3</option>
+                            <option value="4|0x3c513bb978ab6c4ae7c5f25b61a839332842410d">Conta 4</option>
+                        </select>
+                </div>
+                <div class="ui-block-b">
+                    <input type="button" id="cadastrar_permissao" data-inline="true" value="Permitir" data-mini="true">
+                </div>
+            </div>
+            <div id="permissao_3" class="ui-content"></div>
+        </div>
+        <div data-role="collapsible">
+            <h3>Facebook</h3>
+            <label for="conta">Selecione uma conta para liber&aacute;-la</label>
+            <div class="ui-grid-a">
+                <div class="ui-block-a">
+                        <select name="conta" id="conta" data-mini="true">
+                            <option value="1|0x3f6b843f2b8b6ea4ec2c18aa8fae5a92bff02079">Conta 1</option>
+                            <option value="2|0x361f832d63bf0f756161bf744aa7a4eaad5c8328">Conta 2</option>
+                            <option value="3|0x0b697fd49ad5e2a30dc1e970e8db1b9d0a1c25b4">Conta 3</option>
+                            <option value="4|0x3c513bb978ab6c4ae7c5f25b61a839332842410d">Conta 4</option>
+                        </select>
+                </div>
+                <div class="ui-block-b">
+                    <input type="button" id="cadastrar_permissao" data-inline="true" value="Permitir" data-mini="true">
+                </div>
+            </div>
+            <div id="permissao_4" class="ui-content"></div>
+        </div>
+    </div>
+
+    <div data-role="popup" id="campos_bloco" data-arrow="b">
+    	<p>This is a completely basic popup, no options set.<p>
+    </div>
+
+    <!--div data-role="footer">
+      <h1>My Footer</h1>
+  </div-->
+</div>
+
+<div data-role="page" id="consultas">
+    <div data-role="header">
+      <!--h1>Welcome To My Homepage</h1-->
+      <div data-role="navbar">
+        <ul>
+            <li><a href="#meus_dados" data-transition="fade" data-icon="bars" id="btn_meus_dados">Meus Dados</a></li>
+            <li><a href="#permissoes" data-transition="fade" data-icon="lock" id="btn_permissoes">Permiss&otilde;es</a></li>
+            <li><a href="#consultas" data-transition="fade" data-icon="search" id="btn_consultas">Consultas</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div data-role="main" class="ui-content">
+      <p>consultas</p>
+    </div>
+
+    <!--div data-role="footer">
+      <h1>My Footer</h1>
+  </div-->
+</div>
+
+<div data-role="popup" id="mensagem_cad_geral" data-arrow="b">
+    <p>Mensagem<p>
+</div>
+
+
+<div class="mensagem_sucesso"></div>
+<div class="mensagem_erro"></div>
+<div class="mensagem_alerta"></div>
+
+</body>
+</html>

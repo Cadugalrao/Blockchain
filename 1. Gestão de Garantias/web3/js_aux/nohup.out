@@ -1,0 +1,13 @@
+time="2016-04-08T23:26:15.961558167Z" level=warning msg="Udev sync is not supported. This will lead to unexpected behavior, data loss and errors. For more information, see https://docs.docker.com/reference/commandline/daemon/#daemon-storage-driver-option" 
+time="2016-04-08T23:26:15.963088483Z" level=info msg="API listen on /var/run/docker.sock" 
+time="2016-04-08T23:26:15.975873504Z" level=warning msg="Usage of loopback devices is strongly discouraged for production use. Please use `--storage-opt dm.thinpooldev` or use `man docker` to refer to dm.thinpooldev section." 
+time="2016-04-08T23:26:15.983543190Z" level=info msg="[graphdriver] using prior storage driver \"devicemapper\"" 
+time="2016-04-08T23:26:16.000100030Z" level=info msg="Firewalld running: false" 
+time="2016-04-08T23:26:16.020499408Z" level=info msg="Default bridge (docker0) is assigned with an IP address 172.17.42.1/16. Daemon option --bip can be used to set a preferred IP address" 
+time="2016-04-08T23:26:16.052926793Z" level=warning msg="Your kernel does not support swap memory limit." 
+time="2016-04-08T23:26:16.112237815Z" level=info msg="Loading containers: start." 
+....................................
+time="2016-04-08T23:26:16.126237208Z" level=info msg="Loading containers: done." 
+time="2016-04-08T23:26:16.126256433Z" level=info msg="Daemon has completed initialization" 
+time="2016-04-08T23:26:16.126274940Z" level=info msg="Docker daemon" commit=a34a1d5 execdriver=native-0.2 graphdriver=devicemapper version=1.9.1 
+time="2016-04-08T23:26:31.471041689Z" level=info msg="Processing signal 'interrupt'" 

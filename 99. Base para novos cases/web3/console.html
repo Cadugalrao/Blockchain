@@ -1,0 +1,469 @@
+<!doctype>
+<html>
+
+<head>
+<meta http-equiv="refresh" content="180">
+
+<script type="text/javascript" src="js_aux/web3.js"></script>
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="js_aux/debug.js"></script>
+<script src="js_aux/config.js"></script>
+<script src="js_aux/utils.js"></script>
+
+<style>
+* {
+	font-size: 14px;
+
+}
+
+.node_info {
+	display: inline-block; 
+	width: 300px; 
+	background-color:#FFFFFF; 
+	margin: 5px; 
+	padding: 5px;
+}
+
+.modal {
+    display:    none;
+    position:   fixed;
+    z-index:    1000;
+    top:        0;
+    left:       0;
+    height:     100%;
+    width:      100%;
+    background: rgba( 255, 255, 255, .8 ) 
+                url('http://i.stack.imgur.com/FhHRx.gif') 
+                50% 50% 
+                no-repeat;
+}
+
+body.loading {
+    overflow: hidden;   
+}
+
+body.loading .modal {
+    display: block;
+}
+
+
+</style>
+
+<script type="text/javascript">
+    /*
+	$(document).on({
+		ajaxStart: function() { $body.addClass("loading");    },
+		ajaxStop: function() { $body.removeClass("loading"); }    
+	});
+	*/
+	var primeira_executacao = true;
+	var auxTimeoutInicial = 150;
+	var auxTimeout = 1;
+	var ultima_atualizacao = "";
+	
+	var Web3 = require('web3');
+    
+    var node1_conectado = false;
+	var web3_node1 = new Web3();
+	var web3_node2 = new Web3();
+    var web3_node3 = new Web3();
+    var web3_node4 = new Web3();
+    
+	/*
+	web3_node4.sendAsync('{"jsonrpc":"2.0","method":"miner_start","params":["0x04"],"id":74}', cb);
+	
+	function cb(e, result) {
+		alert(e + ", " + result.error + ", ");
+	}
+	*/
+	
+	var gestao_duplicatasABI;
+	var gestao_duplicatas;
+	
+	function atualizarInformacoesNode1() {
+	
+		if (!NODES_LOCAL) {
+			$("#url_n1").html("<a href=\""+ config[1].Nodes[1].URL +"\" target=\"_new\">" + config[1].Nodes[1].URL + "</a>");
+		} else {
+			$("#url_n1").html("<a href=\""+ config[1].Nodes[1].URL +"\" target=\"_new\">" + config[3].Nodes_Local[1].URL + "</a>");
+		}
+		var node_conectado = true;
+		try {
+		
+			node_conectado = web3_node1.isConnected();
+			if (node_conectado) {
+				imagem = "<img src=\"js_aux/images/green.png\" width=\"15\" />";
+			} else {
+				imagem = "<img src=\"js_aux/images/red.png\" width=\"15\" />";
+			}
+			
+			$("#ativo_n1").html(imagem);
+			
+		} catch (e) {
+			node_conectado = false;
+			$("#ativo_n1").html("<img src=\"js_aux/images/red.png\" width=\"15\" />");
+		}
+		
+		if (node_conectado) {
+			
+			gestao_duplicatasABI_o = web3_node1.eth.contract(gestao_duplicatasABI);
+			gestao_duplicatas = gestao_duplicatasABI_o.at(gestao_duplicatasAddress);
+			
+			try {
+				node_minerando = web3_node1.eth.mining;
+				
+				if (node_minerando) {
+					imagem = "<img src=\"js_aux/images/green.png\" width=\"15\" />";
+				} else {
+					imagem = "<img src=\"js_aux/images/red.png\" width=\"15\" />";
+				}
+				$("#situacao_mining_n1").html(imagem);
+				
+			} catch (e) {
+				node_minerando = false;
+				$("#situacao_mining_n1").html("<img src=\"js_aux/images/red.png\" width=\"15\" />");
+			}
+		} else {
+			$("#situacao_mining_n1").html("<img src=\"js_aux/images/red.png\" width=\"15\" />");
+		}
+		
+		node1_conectado = node_conectado;
+	}
+	
+	function atualizarInformacoesNode2() {
+		$("#url_n2").html("<a href=\""+ config[1].Nodes[2].URL +"\" target=\"_new\">" + config[1].Nodes[2].URL + "</a>");
+		var node_conectado = true;
+		try {
+		
+			node_conectado = web3_node2.isConnected();
+			if (node_conectado) {
+				imagem = "<img src=\"js_aux/images/green.png\" width=\"15\" />";
+			} else {
+				imagem = "<img src=\"js_aux/images/red.png\" width=\"15\" />";
+			}
+			
+			$("#ativo_n2").html(imagem);
+			
+		} catch (e) {
+			node_conectado = false;
+			$("#ativo_n2").html("<img src=\"js_aux/images/red.png\" width=\"15\" />");
+		}
+		
+		if (node_conectado) {
+			try {
+				node_minerando = web3_node2.eth.mining;
+				
+				if (node_minerando) {
+					imagem = "<img src=\"js_aux/images/green.png\" width=\"15\" />";
+				} else {
+					imagem = "<img src=\"js_aux/images/red.png\" width=\"15\" />";
+				}
+				$("#situacao_mining_n2").html(imagem);
+				
+			} catch (e) {
+				node_minerando = false;
+				$("#situacao_mining_n2").html("<img src=\"js_aux/images/red.png\" width=\"15\" />");
+			}
+		} else {
+			$("#situacao_mining_n2").html("<img src=\"js_aux/images/red.png\" width=\"15\" />");
+		}
+	}
+	
+	function atualizarInformacoesNode3() {
+		$("#url_n3").html("<a href=\""+ config[1].Nodes[3].URL +"\" target=\"_new\">" + config[1].Nodes[3].URL + "</a>");
+		var node_conectado = true;
+		try {
+		
+			node_conectado = web3_node3.isConnected();
+			if (node_conectado) {
+				imagem = "<img src=\"js_aux/images/green.png\" width=\"15\" />";
+			} else {
+				imagem = "<img src=\"js_aux/images/red.png\" width=\"15\" />";
+			}
+			
+			$("#ativo_n3").html(imagem);
+			
+		} catch (e) {
+			node_conectado = false;
+			$("#ativo_n3").html("<img src=\"js_aux/images/red.png\" width=\"15\" />");
+		}
+		
+		if (node_conectado) {
+			try {
+				node_minerando = web3_node3.eth.mining;
+				
+				if (node_minerando) {
+					imagem = "<img src=\"js_aux/images/green.png\" width=\"15\" />";
+				} else {
+					imagem = "<img src=\"js_aux/images/red.png\" width=\"15\" />";
+				}
+				$("#situacao_mining_n3").html(imagem);
+				
+			} catch (e) {
+				node_minerando = false;
+				$("#situacao_mining_n3").html("<img src=\"js_aux/images/red.png\" width=\"15\" />");
+			}
+		} else {
+			$("#situacao_mining_n3").html("<img src=\"js_aux/images/red.png\" width=\"15\" />");
+		}
+	}
+	
+	function atualizarInformacoesNode4() {
+		$("#url_n4").html("<a href=\""+ config[1].Nodes[4].URL +"\" target=\"_new\">" + config[1].Nodes[4].URL + "</a>");
+		var node_conectado = true;
+		try {
+		
+			node_conectado = web3_node4.isConnected();
+			if (node_conectado) {
+				imagem = "<img src=\"js_aux/images/green.png\" width=\"15\" />";
+			} else {
+				imagem = "<img src=\"js_aux/images/red.png\" width=\"15\" />";
+			}
+			
+			$("#ativo_n4").html(imagem);
+			
+		} catch (e) {
+			node_conectado = false;
+			$("#ativo_n4").html("<img src=\"js_aux/images/red.png\" width=\"15\" />");
+		}
+		
+		if (node_conectado) {
+			try {
+				node_minerando = web3_node4.eth.mining;
+				
+				if (node_minerando) {
+					imagem = "<img src=\"js_aux/images/green.png\" width=\"15\" />";
+				} else {
+					imagem = "<img src=\"js_aux/images/red.png\" width=\"15\" />";
+				}
+				$("#situacao_mining_n4").html(imagem);
+				
+			} catch (e) {
+				node_minerando = false;
+				$("#situacao_mining_n4").html("<img src=\"js_aux/images/red.png\" width=\"15\" />");
+			}
+		} else {
+			$("#situacao_mining_n4").html("<img src=\"js_aux/images/red.png\" width=\"15\" />");
+		}
+	}
+	
+	function sleep(milliseconds) {
+		var start = new Date().getTime();
+		for (var i = 0; i < 1e7; i++) {
+			if ((new Date().getTime() - start) > milliseconds){
+				break;
+			}
+		}
+	}
+	
+	function atualizar_geral() {
+		
+		if (primeira_executacao) {
+			primeira_executacao = false;
+			if (!NODES_LOCAL) {
+				web3_node1.setProvider(new web3_node1.providers.HttpProvider(config[1].Nodes[1].URL));
+				web3_node2.setProvider(new web3_node2.providers.HttpProvider(config[1].Nodes[2].URL));
+				web3_node3.setProvider(new web3_node3.providers.HttpProvider(config[1].Nodes[3].URL));
+				web3_node4.setProvider(new web3_node4.providers.HttpProvider(config[1].Nodes[4].URL));
+			} else {
+				web3_node1.setProvider(new web3_node1.providers.HttpProvider(config[3].Nodes_Local[1].URL));
+			}
+		}			
+
+		atualizarInformacoesNode1();
+		if (!NODES_LOCAL) {
+			atualizarInformacoesNode2();
+			atualizarInformacoesNode3();
+			atualizarInformacoesNode4();
+		}
+		
+		
+		if (node1_conectado)
+		{
+			var operacoes_html = "";
+			var duplicatas_html = "";
+			var associacao_html = "";
+			var arr_aux_operacao = [];
+			var total_loops = gestao_duplicatas.contar_operacoes();
+			for (var i=0; i < total_loops; i++) {
+				arr_aux_operacao[i] = gestao_duplicatas.consultar_operacao(i);
+				
+				codigo_op_aux = arr_aux_operacao[i][0].toString().replace(/[^\x20-\x7E]+/g, '') + "";
+				valor_op_aux = arr_aux_operacao[i][1];
+				valor_atualizado_op_aux = arr_aux_operacao[i][2];
+				
+				operacoes_html = operacoes_html + "<tr>";
+				operacoes_html = operacoes_html + "<td>" + i + "</td>";
+				operacoes_html = operacoes_html + "<td>" + codigo_op_aux + "</td>";
+				operacoes_html = operacoes_html + "<td>" + formata_numero_decida(valor_op_aux, false) + "</td>";
+				operacoes_html = operacoes_html + "<td>" + formata_numero_decida(valor_atualizado_op_aux, false) + "</td>";
+				operacoes_html = operacoes_html + "</tr>";
+			}
+			$("#operacoes").html(operacoes_html);
+			$("#operacoes").html("<table border><tr><td></td><td>codigo_op_aux</td><td>valor_op_aux</td><td>valor_atualizado_op_aux</td></tr>" + operacoes_html + "</table>");	
+			
+
+			var arr_duplicatas = [];
+			var arr_associacoes = [];
+			total_loops = gestao_duplicatas.contar_alocacoes();
+			for (var i=0; i < total_loops; i++) {
+				arr_associacoes[i] = gestao_duplicatas.consultar_alocacao(i);
+				
+				chave_ass_aux = arr_associacoes[i][0].toString(10);
+				codigo_op_ass_aux = arr_associacoes[i][1].replace(/[^\x20-\x7E]+/g, '').trim();
+				ativa_ass_aux = arr_associacoes[i][2];
+				
+				chave_encontrada = false;
+				for (var d = 0; d < arr_duplicatas.length; d++) {
+					if (arr_duplicatas[d] == chave_ass_aux) {
+						chave_encontrada = true;
+						break;
+					}
+				}
+				
+				if (!chave_encontrada) {
+					arr_duplicatas.push(chave_ass_aux);
+					
+					dados_duplicata = gestao_duplicatas.consultar_duplicata(chave_ass_aux);
+					arr_aux_duplicata = dados_duplicata.toString().split(",");
+
+					dataCriacao = arr_aux_duplicata[0].replace(/[^\x20-\x7E]+/g, '').trim();
+					cnpj_emissor = formata_numero_decida(arr_aux_duplicata[1].toString().replace(/[^\x20-\x7E]+/g, '').trim());
+					cpf_cnpj_sacado = formata_numero_decida(arr_aux_duplicata[2].toString().replace(/[^\x20-\x7E]+/g, '').trim());
+					valor = arr_aux_duplicata[3].toString().replace(/[^\x20-\x7E]+/g, '').trim();
+					situacao = arr_aux_duplicata[4].toString().replace(/[^\x20-\x7E]+/g, '').trim();
+					situacao_desc = arr_aux_duplicata[5].toString().replace(/[^\x20-\x7E]+/g, '').trim();
+					index_associacao = arr_aux_duplicata[6];
+					
+					duplicatas_html = duplicatas_html + "<tr>";
+					duplicatas_html = duplicatas_html + "<td>" + i + "</td>";
+					duplicatas_html = duplicatas_html + "<td>" + chave_ass_aux + "</td>";
+					duplicatas_html = duplicatas_html + "<td>" + dataCriacao + "</td>";
+					duplicatas_html = duplicatas_html + "<td>" + cnpj_emissor + "</td>";
+					duplicatas_html = duplicatas_html + "<td>" + valor + "</td>";
+					duplicatas_html = duplicatas_html + "<td>" + situacao + "</td>";
+					duplicatas_html = duplicatas_html + "<td>" + situacao_desc + "</td>";
+					duplicatas_html = duplicatas_html + "<td>" + index_associacao + "</td>";
+					duplicatas_html = duplicatas_html + "</tr>";
+				}
+				
+				associacao_html = associacao_html + "<tr>";
+				associacao_html = associacao_html + "<td>" + i + "</td>";
+				associacao_html = associacao_html + "<td>" + chave_ass_aux + "</td>";
+				associacao_html = associacao_html + "<td>" + codigo_op_ass_aux + "</td>";
+				associacao_html = associacao_html + "<td>" + ativa_ass_aux + "</td>";
+				associacao_html = associacao_html + "</tr>";
+			}
+			$("#duplicatas").html("<table border><tr><td></td><td>chave_ass_aux</td><td>dataCriacao</td><td>cnpj_emissor</td><td>valor</td><td>situacao</td><td>situacao_desc</td><td>index_associacao</td></tr>" + duplicatas_html + "</table>");
+			
+			$("#associacao").html("<table border><tr><td></td><td>chave_ass_aux</td><td>codigo_op_ass_aux</td><td>ativa_ass_aux</td></tr>" + associacao_html + "</table>");	
+			
+			
+			
+		}
+		
+		auxTimeout = auxTimeoutInicial;
+		
+		var data = new Date()
+		ultima_atualizacao = data.toLocaleTimeString();
+		
+		main_retorno();
+	}
+	
+	
+	function mainConsole() {
+		//alert($("body").attr('class'));
+		try{
+			$("div#timeout").html("Pr&oacute;xima atualiza&ccedil;&atilde;o em " + auxTimeout + " segundos. &Uacute;ltima Atualiza&ccedil;&atilde;o: " + ultima_atualizacao);
+			
+			if (auxTimeout == 1) {
+				$("body").addClass("loading");
+				
+				setTimeout(atualizar_geral,1);
+				
+				sleep(1000);
+				
+			} else {
+				auxTimeout = auxTimeout - 1
+			}
+		}
+		catch(e){
+			alert(e);
+		}
+	}
+	
+	function main_retorno() {
+		$("body").removeClass("loading");
+	}
+	
+	
+	$( document ).ready(function() {
+		$("div#link").html("<a href=\"" + config[0].URL_Web + "\" target=\"_new\">Link para o site</a>");
+		setInterval(mainConsole, 1000);
+	});
+	
+	
+</script>
+</head>
+<body class="loading">
+	<div id="node_n" style="width: 100%; background-color:#CCCCCC;">
+		<div><b style="font-size:20px;">Dashboard</b></div> <div id="timeout"></div> <div id="link"></div>
+		<div id="mining" class="node_info">
+			<table></tr>
+			<td><span style="font-size:28px; font-style:bold;">1</span></td>
+			<td>
+			Ativo Node: <span id="ativo_n1"></span><br />
+			Situa&ccedil;&atilde;o de Minera&ccedil;&atilde;o Node: <span id="situacao_mining_n1"></span><br />
+			URL Node: <span id="url_n1"></span>
+			</td>
+			</tr></table>
+		</div>
+		<div id="mining" class="node_info">
+			<table></tr>
+			<td><span style="font-size:28px; font-style:bold;">2</span></td>
+			<td>
+			Ativo Node: <span id="ativo_n2"></span><br />
+			Situa&ccedil;&atilde;o de Minera&ccedil;&atilde;o Node: <span id="situacao_mining_n2"></span><br />
+			URL Node: <span id="url_n2"></span>
+			</td>
+			</tr></table>
+		</div>
+		<div id="mining" class="node_info">
+			<table></tr>
+			<td><span style="font-size:28px; font-style:bold;">3</span></td>
+			<td>
+			Ativo Node: <span id="ativo_n3"></span><br />
+			Situa&ccedil;&atilde;o de Minera&ccedil;&atilde;o Node: <span id="situacao_mining_n3"></span><br />
+			URL Node: <span id="url_n3"></span>
+			</td>
+			</tr></table>
+		</div>
+		<div id="mining" class="node_info">
+			<table></tr>
+			<td><span style="font-size:28px; font-style:bold;">4</span></td>
+			<td>
+			Ativo Node: <span id="ativo_n4"></span><br />
+			Situa&ccedil;&atilde;o de Minera&ccedil;&atilde;o Node: <span id="situacao_mining_n4"></span><br />
+			URL Node: <span id="url_n4"></span>
+			</td>
+			</tr></table>
+		</div>
+	</div>
+	<br />
+	<div style="display: inline-block; margin: 5px; padding: 5px;">
+	<span>operacoes</span>
+	<div id="operacoes"></div>
+	</div>
+
+	<div style="display: inline-block; margin: 5px; padding: 5px;">
+	<span>duplicatas</span>
+	<div id="duplicatas"></div>
+	</div>
+	<div style="display: inline-block; margin: 5px; padding: 5px;">
+	<span>Associa&ccedil;&atilde;o</span>
+	<div id="associacao"></div>
+	</div>
+	
+	<div class="modal"><!-- Place at bottom of page --></div>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gest&atilde;o de Duplicatas</title>
+	<script src="js_aux/debug.js"></script>
+    <script src="js_aux/web3.js"></script>
+    <script src="js_aux/bignumber.js"></script>
+    <script src="js_aux/mascara_cpf.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+	<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+	<script>
+		$(document).bind('mobileinit',function(){
+			$.mobile.changePage.defaults.changeHash = false;
+			$.mobile.hashListeningEnabled = false;
+			$.mobile.pushStateEnabled = false;
+		});
+		$.event.special.tap = {
+			tapholdThreshold: 750,
+
+			setup: function() {
+				var thisObject = this,
+					$this = $( thisObject );
+
+				$this.bind( "vmousedown", function( event ) {
+
+					if ( event.which && event.which !== 1 ) {
+						return false;
+					}
+
+					var origTarget = event.target,
+						origEvent = event.originalEvent,
+						/****************Modified Here**************************/
+						tapfired = false,
+						timer;
+
+					function clearTapTimer() {
+						clearTimeout( timer );
+					}
+
+					function clearTapHandlers() {
+						clearTapTimer();
+
+						$this.unbind( "vclick", clickHandler )
+							.unbind( "vmouseup", clearTapTimer );
+						$( document ).unbind( "vmousecancel", clearTapHandlers );
+					}
+
+					function clickHandler( event ) {
+						clearTapHandlers();
+
+						// ONLY trigger a 'tap' event if the start target is
+						// the same as the stop target.
+						/****************Modified Here**************************/
+						//if ( origTarget === event.target) {
+						 if ( origTarget === event.target && !tapfired) {
+							 triggerCustomEvent( thisObject, "tap", event );
+						 }
+					}
+
+					$this.bind( "vmouseup", clearTapTimer )
+						.bind( "vclick", clickHandler );
+					$( document ).bind( "vmousecancel", clearTapHandlers );
+
+					timer = setTimeout( function() {
+						tapfired = true;/****************Modified Here**************************/
+						triggerCustomEvent( thisObject, "taphold", $.Event( "taphold", { target: origTarget } ) );
+					}, $.event.special.tap.tapholdThreshold );
+				});
+			}
+		};
+	</script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script src="js_aux/jquery-ui.js"></script>
+
+	<script src="js_aux/jquery.number.js"></script>
+	<script src="js_aux/config.js"></script>
+	<script src="js_aux/utils.js"></script>
+	<link rel="stylesheet" href="js_aux/style.css">
+	<script type="text/javascript">
+		var numero_instituicao;
+		var Web3 = require('web3');
+		var web3 = new Web3();
+
+		$( document ).ready(function() {
+			main();
+		});
+	</script>
+  </head>
+	<body style="width: 300px;">
+
+    <div id="page-select" style="">
+        <div id="wrapper" style="height:250px;">
+            <h1>Gest&atilde;o de Duplicatas</h1>
+            <h2><b>Blockchain</b></h2>
+            <br>
+            <br>
+            <br>
+            <center>
+                Selecione a institui&ccedil;&atilde;o
+            <select id="instituicoes" style=""></select>
+            </center>
+        </div>
+    </div>
+
+    <div id="page-app" style="display:none;">
+    	<div id="wrapper">
+    		<h1 id="titulo">Gest&atilde;o de Duplicatas</h1>
+    		<ul class="nav">
+    			<li class="box-duplicata" id="menu-duplicata">
+    				<img class="icon" src="js_aux/images/duplicata.png" alt="" width="40" height="40">
+    				<span>Duplicatas</span>
+    			</li>
+    			<li class="box-operacao" id="menu-operacao">
+    				<img class="icon" src="js_aux/images/operacao.png" alt="" width="40" height="40">
+    				<span>Opera&ccedil;&otilde;es</span>
+    			</li>
+    			<li class="box-control" id="menu-controle">
+    				<img class="icon" src="js_aux/images/control.png" alt="" width="40" height="40">
+    				<span>Controle</span>
+    			</li>
+				<li class="box-monitor" id="menu-transacoes">
+					<img class="icon" src="js_aux/images/Monitor.png" alt="" width="40" height="40">
+					<span>Monitora&ccedil;&atilde;o</span>
+				</li>
+    		</ul>
+    	</div>
+    	<div id="sub-menu-operacao" style="display:none;">
+    		<div id="wrapper-sub-menu">
+    			<ul class="nav" style="">
+    				<li class="cinza" id="sub-menu-operacao-consultar">
+    					<img class="icon_sub" src="js_aux/images/lupa.png" alt="" width="25"" height="25"">
+    					<span class="cinza_texto">Consultar</span>
+    				</li>
+    				<li class="cinza" id="sub-menu-operacao-incluir">
+    					<img class="icon_sub" src="js_aux/images/plus.png" alt="" width="25"" height="25"">
+    					<span class="cinza_texto">Incluir</span>
+    				</li>
+    			</ul>
+    		</div>
+    	</div>
+    	<div id="sub-menu-duplicata" style="display:none;">
+    		<div id="wrapper-sub-menu">
+    			<ul class="nav" style="">
+    				<li class="cinza" id="sub-menu-duplicata-consultar">
+    					<img class="icon_sub" src="js_aux/images/lupa.png" alt="" width="25"" height="25">
+    					<span class="cinza_texto">Consultar</span>
+    				</li>
+    				<li class="cinza" id="sub-menu-duplicata-incluir">
+    					<img class="icon_sub" src="js_aux/images/plus.png" alt="" width="25" height="25">
+    					<span class="cinza_texto">Incluir</span>
+    				</li>
+    			</ul>
+    		</div>
+    	</div>
+    	<div id="sub-menu-controle" style="display:none;">
+    		<div id="wrapper-sub-menu">
+    			<ul class="nav" style="">
+    				<li class="cinza" id="sub-menu-sobra">
+    					<img class="icon_sub" src="js_aux/images/overflow.png" alt="" width="25" height="25">
+    					<span class="cinza_texto">Sobras</span>
+    				</li>
+    				<li class="cinza" id="sub-menu-falta">
+    					<img class="icon_sub" src="js_aux/images/warning.png" alt="" width="25" height="25">
+    					<span class="cinza_texto">Faltas</span>
+    				</li>
+    			</ul>
+    		</div>
+    	</div>
+    	<div id="master-container" style="display:none;">
+    		<div id="controle_lista_eventos" style="display:none;"></div>
+
+    		<div id="controle_sobra" style="display:none;">
+    			<b class="title_sobra">Sobra de opra&ccedil;&otilde;es</b>
+    			<div id="div-slider-sobra"><input type="range" name="slider-range-max-sobra" data-mini="true" id="slider-range-max-sobra" data-highlight="true" data-popup-enabled="true" min="0" max="100" step="1" value="30"></div>
+    			<span style="font-size:0.7em; margin-left:10px; position:relative; top:-35px;">Percentual de cobertura excedente: <span id="limite_sobra">30%</span></span>
+    			<div id="controle_sobra_conteudo" style="position:relative; top:-35px;"></div>
+    		</div>
+
+    		<div id="controle_falta" style="display:none;">
+    			<b class="title_falta">Insufici&ecirc;ncia de operacoes cobertas</b>
+    			<div id="div-slider-falta"><input type="range" name="slider-range-max-falta" data-mini="true" id="slider-range-max-falta" data-highlight="true" data-popup-enabled="true" min="1" max="99" step="1" value="99"></div>
+    			<span style="font-size:0.7em; margin-left:10px; position:relative; top:-35px;">Percentual de Cobertura: <span id="limite_falta">99%</span></span>
+    			<div id="controle_falta_conteudo" style="position:relative; top:-35px;"></div>
+    		</div>
+
+    		<!-- Inicio operacao -->
+    		<div id="incluir_operacao" style="display:none;">
+    			<b class="title">Inclus&atilde;o de opera&ccedil;&otilde;es</b>
+    			<table>
+    			<tr><td>C&oacute;digo:</td><td><input id="codigo_operacao" maxlength="25" /></td></tr>
+    			<tr><td>Valor:</td><td><input id="valor_operacao" maxlength="16" /></td></tr>
+    			</table>
+    			<button id="incluir_operacao_btn">Incluir Opera&ccedil;&atilde;o</button>
+    		</div>
+
+    		<div id="alterar_operacao" style="display:none;">
+    			<b class="title">Altera&ccedil;&atilde;o de operacoes</b>
+    			<table>
+    			<tr><td>C&oacute;digo:</td><td><span id="codigo_operacao_alt"></span></td></tr>
+    			<tr><td>Valor:</td><td><span id="valor_operacao_alt"></span></td></tr>
+    			<tr><td>Valor Atualizado:</td><td><input id="valor_atualizado_operacao_alt" value="" maxlength="16" /></td></tr>
+    			</table>
+    			<button id="alterar_operacao_btn">Alterar Opera&ccedil;&atilde;o</button>
+    		</div>
+			
+    		<div id="consultar_operacao" style="display:none;"></div>
+    		<!-- Fim operacao -->
+
+    		<!-- Inicio duplicata -->
+    		<div id="incluir_duplicata" style="display:none;">
+    			<b class="title">Inclus&atilde;o de Duplicatas</b>
+    			<table>
+                    <tr><td>C&oacute;digo da Opera&ccedil;&atilde;o:</td><td><input id="codigo_op" maxlength="25" /></td></tr>
+                    <tr><td>Chave da Duplicata:</td><td><input id="chave_duplicata" maxlength="44" /></td></tr>
+				</table>
+				<div data-role="collapsible" data-mini="true" id="dados_duplicata">
+				    <h4>Dados da Duplicata</h4>
+				    <table>
+						<tr><td>Sacado (CNPJ/CPF):</td><td><input id="cpf_cnpj_sacado" maxlength="14" onBlur="valida_cpf_cnpj($('#cpf_cnpj_sacado'));" /></td></tr>
+						<tr><td>Emissor (CNPJ):</td><td><input id="cnpj_emissor" maxlength="18" onBlur="MascaraCNPJ($('#cnpj_emissor')[0]); if ($('#cnpj_emissor').val().toString().trim().length > 0) ValidarCNPJ($('#cnpj_emissor')[0]);" onKeyPress="MascaraCNPJ($('#cnpj_emissor')[0]);" /></td></tr>
+						<tr><td>Valor:</td><td><input id="valor_duplicata" maxlength="16" /></td></tr>
+					</table>
+					<div data-role="fieldcontain">
+						<fieldset data-role="controlgroup">
+							<input type="checkbox" name="situacao_nova_duplicata" id="situacao_nova_duplicata" class="custom" />
+							<label for="situacao_nova_duplicata" style="padding-left: 40px;">Pendente de An&aacute;lise</label>
+						</fieldset>
+					</div>
+				</div>
+				
+    			<button id="incluir_duplicata_btn">Incluir Duplicata</button>
+
+                <div id="incluir_duplicata_lista_duplicatas"></div>
+    		</div>
+
+    		<div id="alterar_duplicata" style="display:none;">
+    			<b class="title">Altera&ccedil;&atilde;o de Duplicata</b>
+    			<table>
+                    <tr><td width="30%">C&oacute;digo da Opera&ccedil;&atilde;o:</td></tr>
+                    <tr><td><span id="codigo_op_alt" style="padding-left:20px; font-size:0.8em;"></span></td></tr>
+                    <tr><td width="30%">Chave da Duplicata:</td></tr>
+                    <tr><td><span id="chave_duplicata_alt" style="padding-left:20px; font-size:0.8em;"></span></td></tr>
+				</table>
+			    <table>
+					<tr><td width="30%">Sacado (CNPJ/CPF):</td><td><input id="cpf_cnpj_sacado_alt" maxlength="14" onBlur="valida_cpf_cnpj($('#cpf_cnpj_sacado_alt'));" /></td></tr>
+					<tr><td width="30%">Emissor (CNPJ):</td><td><input id="cnpj_emissor_alt" maxlength="18" onBlur="MascaraCNPJ($('#cnpj_emissor_alt')[0]); if ($('#cnpj_emissor_alt').val().toString().trim().length > 0) ValidarCNPJ($('#cnpj_emissor_alt')[0]);" onKeyPress="MascaraCNPJ($('#cnpj_emissor_alt')[0]);" /></td></tr>
+					<tr><td width="30%">Valor:</td><td><input id="valor_duplicata_alt" maxlength="16" /></td></tr>
+					<tr><td width="30%">Situa&ccedil;&atilde;o Atual:</td><td><span id="situacao_duplicata_text_alt"></span></td></tr>
+				</table>
+				<div id="situacao_duplicata_select_div_alt" style="display:none;">
+			    <table>
+					<tr><td width="30%">Nova Situa&ccedil;&atilde;o:</td><td>
+						<select id="situacao_duplicata_select_alt"></select>
+					</td></tr>
+				</table>
+				</div>
+			    <table>
+				</table>
+				
+				<input type="hidden" id="index_duplicata_alt" />
+				<input type="hidden" id="index_operacao_alt" />
+    			<button id="alterar_duplicata_btn">Alterar Duplicata</button>
+    		</div>
+
+    		<div id="consultar_duplicata" style="display:none;"></div>
+    		<!-- Fim duplicata -->
+    	</div>
+
+    	<div class="mensagem_sucesso"></div>
+    	<div class="mensagem_erro"></div>
+    	<div class="mensagem_alerta"></div>
+    </div>
+    <div class="modal"><!-- Place at bottom of page --></div>
+	<div data-role="popup" id="popup_chave" class="ui-content">
+		<a href="#" id="close_chave" data-rel="back" class="ui-btn ui-corner-all ui-shadow ui-btn-a ui-icon-delete ui-btn-icon-notext ui-btn-right">Close</a>
+		<p style="font-size:0.7em;"></p>
+	</div>
+	</body>
+</html>

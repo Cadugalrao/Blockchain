@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Gest&atilde;o de Garantias</title>
+	<script src="js_aux/web3.js"></script>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+	<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+	<script>
+		$(document).bind('mobileinit',function(){
+			$.mobile.changePage.defaults.changeHash = false;
+			$.mobile.hashListeningEnabled = false;
+			$.mobile.pushStateEnabled = false;
+		});
+	</script> 
+	<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+	
+	<script src="js_aux/jquery.number.js"></script>
+	<script src="js_aux/debug.js"></script>
+	<script src="js_aux/config.js"></script>
+	<script src="js_aux/utils.js"></script>
+	<link rel="stylesheet" href="js_aux/style.css">
+	<script type="text/javascript">
+		var numero_banco = 2;
+		var node = config[1].Nodes[numero_banco].name;
+		var Web3 = require('web3');
+		var web3_node1 = new Web3();
+		
+		if (!NODES_LOCAL) {
+			web3_node1.setProvider(new web3_node1.providers.HttpProvider(config[1].Nodes[numero_banco].URL));
+		} else {
+			web3_node1.setProvider(new web3_node1.providers.HttpProvider(config[3].Nodes_Local[numero_banco].URL));
+		}
+		var gestao_garantiasABI_o = web3_node1.eth.contract(gestao_garantiasABI);
+		var gestao_garantias = gestao_garantiasABI_o.at(gestao_garantiasAddress);
+		var eventReturnGarantia;
+		var eventReturnBem;
+		var eventReturnAssociacao;
+		
+		$( document ).ready(function() {
+			main();
+		});
+	</script>
+  </head>
+	<body style="width: 300px;">
+	<div id="wrapper" styleeee="display:inline-block;">
+		<h1 id="titulo">Gest&atilde;o de Garantias</h1>
+		<ul class="nav">
+			<li class="hm" id="menu-controle">
+				<img class="icon" src="js_aux/control.png" alt="" width="25" height="25">
+				<span>Controle</span>
+			</li>
+			<li class="gp" id="menu-bem">
+				<img class="icon" src="js_aux/bens.png" alt="" width="25" height="25">
+				<span>Bens e Direitos</span>
+			</li>
+			<li class="fb" id="menu-garantia">
+				<img class="icon" src="js_aux/garantia.png" alt="" width="25" height="25">
+				<span>Garantias</span>
+			</li>
+			<li class="tw" id="menu-associacao">
+				<img class="icon" src="js_aux/associacao.png" alt="" width="25" height="25">
+				<span>Associa&ccedil;&atilde;o</span>
+			</li>
+		</ul>
+	</div>
+	<div id="sub-menu-garantia" style="display:none;">
+		<div id="wrapper-sub-menu" style="background:#99ff99;" id="sub-menu-garantia">
+			<ul class="nav" style="">
+				<li class="cinza" id="sub-menu-garantia-consultar">
+					<img class="icon_sub" src="js_aux/lupa.png" alt="" width="25" height="25">
+					<span class="cinza_texto">Consultar</span>
+				</li>
+				<li class="cinza" id="sub-menu-garantia-incluir">
+					<img class="icon_sub" src="js_aux/plus.png" alt="" width="25" height="25">
+					<span class="cinza_texto">Incluir</span>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div id="sub-menu-bem" style="display:none;">
+		<div id="wrapper-sub-menu" style="background:#00cc99;">
+			<ul class="nav" style="">
+				<li class="cinza" id="sub-menu-bem-consultar">
+					<img class="icon_sub" src="js_aux/lupa.png" alt="" width="25" height="25">
+					<span class="cinza_texto">Consultar</span>
+				</li>
+				<li class="cinza" id="sub-menu-bem-incluir">
+					<img class="icon_sub" src="js_aux/plus.png" alt="" width="25" height="25">
+					<span class="cinza_texto">Incluir</span>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div id="sub-menu-associacao" style="display:none;">
+		<div id="wrapper-sub-menu" style="background:#ccfff2;">
+			<ul class="nav" style="">
+				<li class="cinza" id="sub-menu-associacao-consultar">
+					<img class="icon_sub" src="js_aux/lupa.png" alt="" width="25" height="25">
+					<span class="cinza_texto">Consultar</span>
+				</li>
+				<li class="cinza" id="sub-menu-associacao-incluir">
+					<img class="icon_sub" src="js_aux/plus.png" alt="" width="25" height="25">
+					<span class="cinza_texto">Incluir</span>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div id="sub-menu-controle" style="display:none;">
+		<div id="wrapper-sub-menu" style="background:#009900;">
+			<ul class="nav" style="">
+				<li class="cinza" id="sub-menu-transacoes">
+					<img class="icon_sub" src="js_aux/Monitor.png" alt="" width="25" height="25">
+					<span class="cinza_texto">Monitoração</span>
+				</li>
+				<li class="cinza" id="sub-menu-sobra">
+					<img class="icon_sub" src="js_aux/overflow.png" alt="" width="25" height="25">
+					<span class="cinza_texto">Sobras</span>
+				</li>
+				<li class="cinza" id="sub-menu-falta">
+					<img class="icon_sub" src="js_aux/warning.png" alt="" width="25" height="25">
+					<span class="cinza_texto">Faltas</span>
+				</li>
+			</ul>
+		</div>
+	</div>
+	<div id="master-container" style="display:none;">
+		<div id="controle_lista_eventos" style="display:none;"></div>
+		
+		<div id="controle_sobra" style="display:none;">
+			<b class="title_sobra">Sobra de garantias</b>
+			<div id="div-slider-sobra"><input type="range" name="slider-range-max-sobra" data-mini="true" id="slider-range-max-sobra" data-highlight="true" data-popup-enabled="true" min="0" max="100" step="1" value="30"></div>
+			<span style="font-size:0.7em; margin-left:10px; position:relative; top:-35px;">Percentual de cobertura excedente: <span id="limite_sobra">30%</span></span>
+			<div id="controle_sobra_conteudo" style="position:relative; top:-35px;"></div>
+		</div>
+		
+		<div id="controle_falta" style="display:none;">
+			<b class="title_falta">Insuficiência de Garantias cobertas</b>
+			<div id="div-slider-falta"><input type="range" name="slider-range-max-falta" data-mini="true" id="slider-range-max-falta" data-highlight="true" data-popup-enabled="true" min="1" max="99" step="1" value="99"></div>
+			<span style="font-size:0.7em; margin-left:10px; position:relative; top:-35px;">Percentual de Cobertura: <span id="limite_falta">99%</span></span>
+			<div id="controle_falta_conteudo" style="position:relative; top:-35px;"></div>
+		</div>
+		
+		<!-- Inicio garantia -->
+		<div id="incluir_garantia" style="display:none;">
+			<b class="title">Inclus&atilde;o de Garantias</b>
+			<table>
+			<tr><td>C&oacute;digo:</td><td><input id="codigo_garantia" maxlength="14" /></td></tr>
+			<tr><td>Valor:</td><td><input id="valor_garantia" maxlength="14" /></td></tr>
+			</table>
+			<button id="incluir_garantia_btn" style="background:#99ff99; cursor: hand;">Incluir Garantia</button>
+		</div>
+		
+		<div id="alterar_garantia" style="display:none;">
+			<b class="title">Altera&ccedil;&atilde;o de Garantias</b>
+			<table>
+			<tr><td>C&oacute;digo:</td><td><span id="codigo_garantia_alt"></span></td></tr>
+			<tr><td>Valor:</td><td><span id="valor_garantia_alt"></span></td></tr>
+			<tr><td>Valor Atualizado:</td><td><input id="valor_atualizado_garantia_alt" value="" maxlength="14" /></td></tr>
+			</table>
+			<input type="hidden" id="index_garantia_alt" />
+			<button id="alterar_garantia_btn" style="background:#99ff99; cursor: hand;">Alterar Garantia</button>
+		</div>
+		
+		<div id="consultar_garantia" style="display:none;"></div>
+		<!-- Fim garantia -->
+		
+		<!-- Inicio Bem -->
+		<div id="incluir_bem" style="display:none;">
+			<b class="title">Inclus&atilde;o de Bens e Direitos</b>
+			<table>
+			<tr><td>Tipo:</td><td>
+				<select id="tipo_bem" name="tipo_bem">
+					<!--option value="a" selected>Terreno</option>
+					<option value="b">Im&oacute;vel</option>
+					<option value="c">Carro</option>
+					<option value="d">Moto</option>
+					<option value="e">Trator</option>
+					<option value="f">Avi&atilde;o</option-->
+				</select>
+			</td></tr>
+			<tr><td>C&oacute;digo:</td><td><input id="codigo_bem" maxlength="14" /></td></tr>
+			<tr><td>Valor:</td><td><input id="valor_bem" maxlength="14" /></td></tr>
+			</table>
+			<button id="incluir_bem_btn" style="background:#00cc99; cursor: hand;">Incluir Bem</button>
+		</div>
+		
+		<div id="alterar_bem" style="display:none;">
+			<b class="title">Altera&ccedil;&atilde;o de Bem</b>
+			<table>
+			<tr><td>Tipo:</td><td><span id="tipo_bem_alt"></span></td></tr>
+			<tr><td>C&oacute;digo:</td><td><span id="codigo_bem_alt"></span></td></tr>
+			<tr><td>Valor:</td><td><span id="valor_bem_alt"></span></td></tr>
+			<tr><td>Valor Atualizado:</td><td><input id="valor_atualizado_bem_alt" maxlength="14" value="" /></td></tr>
+			</table>
+			<input type="hidden" id="index_bem_alt" />
+			<button id="alterar_bem_btn" style="background:#00cc99; cursor: hand;">Alterar Bem ou Direito</button>
+		</div>
+		
+		<div id="consultar_bem" style="display:none;"></div>
+		<!-- Fim Bem -->
+		
+		<!-- Inicio Associacao -->
+		<div id="associacao_garantia_consultar" style="display:none;"></div>
+		
+		<div id="associacao_bem_consultar" style="display:none;">
+			<b class="title">Garantia Selecionada</b>
+			<table width="100%" class="lista">
+			<tr><th>C&oacute;digo</th><th>Valor (R$)</th></tr>
+			<tr><td><span id="associacao_bem_consultar_codigo"></span></td><td><span id="valor_exibicao"></span></td></tr>
+			</table>
+			<input type="hidden" id="index_garantia_desalocacao" value="" />
+			<button id="desalocar_associacao_btn" style="background:#ccfff2;">Desalocar todos os bens e direitos</button>
+			<div id="associacao_bem_consultar_conteudo"></div>
+		</div>
+		
+		<div id="associacao_garantia_incluir" style="display:none;"></div>
+		
+		<div id="associacao_bem" style="display:none;"></div>
+		
+		<div id="associacao_confirmar" style="display:none;">
+			<b class="title">Confirma&ccedil;&atilde;o da aloca&ccedil;&atilde;o</b>
+			<br />
+			Garantia Selecionada
+			<table class="lista">
+			<tr><th>C&oacute;digo</th><th>Valor (R$)</th></tr>
+			<tr><td><span id="associacao-confirmar-garantia-codigo"></span></td><td align="right"><span id="associacao-confirmar-garantia-valor"></span></td></tr>
+			</table>
+			<br />
+			Bem / Direito Selecionado
+			<table class="lista">
+			<tr><th>Tipo</th><th>C&oacute;digo</th><th>Valor (R$)</th></tr>
+			<tr><td><span id="associacao-confirmar-bem-tipo"></span></td><td><span id="associacao-confirmar-bem-codigo"></span></td><td align="right"><span id="associacao-confirmar-bem-valor"></span></td></tr>
+			</table>
+			<br />
+			Percentual de alocação do bem (%): <input type="text" value="100" id="percent_bem" maxlength="3" />
+			<input type="hidden" id="index_h_garantia" />
+			<input type="hidden" id="index_h_bem" />
+			<button id="incluir_associacao_btn" style="background:#ccfff2; cursor: hand;">Alocar Bem / Direito</button>
+		</div>
+		<!-- Fim Associacao -->
+	</div>
+	<div class="mensagem_sucesso"></div>
+	<div class="mensagem_erro"></div>
+	<div class="mensagem_alerta"></div>
+	</body>
+</html>
