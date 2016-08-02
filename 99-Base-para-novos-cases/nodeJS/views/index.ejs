@@ -1,0 +1,80 @@
+<html>
+    <head>
+        <title>Push notification server</title>
+        <link rel="shortcut icon" href="">
+        <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        
+    </head>
+    <body>
+        <form id="cadastro">
+            Garantia ID: <input type="text" name="garantia_id"><br>
+            Valor: <input type="text" name="valor"><br>
+            <input type="submit" value="Submit">
+        </form>
+        
+        <time></time>
+        <div id="container">Try to change your xml data to update this content</div>
+        <br><br>
+        sessionID: <%= sessionID %>
+        <br>
+        IP:  <%= ip %>
+        <script>
+        //var socket = io.connect('http://ec2-54-171-185-229.eu-west-1.compute.amazonaws.com');
+        //var socket = io.connect('http://localhost:9090');
+        var socket = io.connect('/');
+        
+        socket.on('connect', function () {
+            // call the server-side function 'adduser' and send one parameter (value of prompt)
+            socket.emit('adduser', '<%= sessionID %>');
+        });
+
+        socket.on('servernotification', function (data) {
+            //var searchUrl = searchUrlFor(data.username);
+
+            if (data.connected) {
+                if (data.toSelf) data.sessionID = 'you';
+                //$('#conversation').append('connected: <a href="' + searchUrl + '" target="_blank">' + escaped(data.username) + '</a><br/>');
+            } else {
+                //$('#conversation').append('disconnected: <a href="' + searchUrl + '" target="_blank">' + escaped(data.username) + '</a><br/>');
+            }
+        });
+
+        /*var markers = [{ "position": "128.3657142857143", "markerPosition": "7" },
+               { "position": "235.1944023323615", "markerPosition": "19" },
+               { "position": "42.5978231292517", "markerPosition": "-3" }];*/
+        
+        $("#cadastro").submit(function () {
+            alert("aaaaa");
+            
+            $.ajax({
+                type: "POST",
+                url: "/" + this.id,
+                // The key needs to match your method's input parameter (case-sensitive).
+                data: { "Markers": "markers" },
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function(data) {
+                    alert(data);
+                },
+                failure: function(errMsg) {
+                    alert(errMsg);
+                }
+            });
+            event.preventDefault();
+        });
+        
+        // on every message recived we print the new datas inside the #container div
+        /*
+        socket.on('notification', function (data) {
+            // convert the json string into a valid javascript object
+
+            $('#container').html(data);
+            $('time').html('Last Update:' + new Date());
+        });
+        */
+
+        //socket.emit('notification', 'plata');
+        </script>
+    </body>
+</html>
