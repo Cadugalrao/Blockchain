@@ -1,30 +1,32 @@
 <html>
     <head>
-    <!-- 
-     * Author:      Gianluca Guarini
-     * Contact:     gianluca.guarini@gmail.com
-     * Website:     http://www.gianlucaguarini.com/
-     * Twitter:     @gianlucaguarini
-    -->
         <title>Push notification server</title>
+        <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+        <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+        
     </head>
     <body>
+        <form action="http://localhost:9090/consultar" method="POST" target="_new">
+            <!--First Name: <input type="text" name="first_name">  <br>
+            Last Name: <input type="text" name="last_name">-->
+            <input type="submit" value="Submit">
+        </form>
+        
         <time></time>
         <div id="container">Try to change your xml data to update this content</div>
-    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
-    <script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-    <script>
-    // creating a new websocket
-    var socket = io.connect('http://ec2-54-171-185-229.eu-west-1.compute.amazonaws.com');
-    //var socket = io.connect('http://ec2-54-171-185-229.eu-west-1.compute.amazonaws.com/node');
-    //var socket = io.connect('http://localhost:9090');
-    // on every message recived we print the new datas inside the #container div
-    socket.on('notification', function (data) {
-        // convert the json string into a valid javascript object
+        
+        <script>
+        //var socket = io.connect('http://ec2-54-171-185-229.eu-west-1.compute.amazonaws.com');
+        var socket = io.connect('http://localhost:9090');
+        // on every message recived we print the new datas inside the #container div
+        socket.on('notification', function (data) {
+            // convert the json string into a valid javascript object
 
-        $('#container').html(data);
-        $('time').html('Last Update:' + new Date());
-    });
-    </script>
+            $('#container').html(data);
+            $('time').html('Last Update:' + new Date());
+        });
+
+        //socket.emit('notification', 'plata');
+        </script>
     </body>
 </html>
