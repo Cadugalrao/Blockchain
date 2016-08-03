@@ -7,10 +7,18 @@
         
     </head>
     <body>
+        <form id="login">
+            Usuário: <input type="text" id="usuario"><br>
+            Senha: <input type="text" id="senha"><br>
+            <input type="submit" value="Enviar">
+            <div id="retorno_login"></div>
+        </form>
+        <hr>
         <form id="cadastro">
-            Garantia ID: <input type="text" name="garantia_id"><br>
-            Valor: <input type="text" name="valor"><br>
-            <input type="submit" value="Submit">
+            Garantia ID: <input type="text" id="garantia_id"><br>
+            Valor: <input type="text" id="valor"><br>
+            <input type="submit" value="Enviar">
+            <div id="retorno_cadastro"></div>
         </form>
         
         <time></time>
@@ -23,6 +31,7 @@
         //var socket = io.connect('http://ec2-54-171-185-229.eu-west-1.compute.amazonaws.com');
         //var socket = io.connect('http://localhost:9090');
         var socket = io.connect('/');
+        var usuario = "";
         
         socket.on('connect', function () {
             // call the server-side function 'adduser' and send one parameter (value of prompt)
@@ -45,22 +54,54 @@
                { "position": "42.5978231292517", "markerPosition": "-3" }];*/
         
         $("#cadastro").submit(function () {
-            $.ajax({
-                type: "POST",
-                url: "/" + this.id,
-                // The key needs to match your method's input parameter (case-sensitive).
-                data: { "Markers": "markers" },
-                //contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function(data) {
-                    alert(data);
-                },
-                failure: function(errMsg) {
+            var _data = {};
+            _data.garantia_id = $("#garantia_id").val();
+            _data.valor = $("#valor").val();
+            _data.usuario = usuario;
+
+            postAjax("/" + this.id, 
+                _data, 
+                function(data) {
+                    $("#retorno_cadastro").html(data);
+                }, function(errMsg) {
                     alert(errMsg);
-                }
-            });
+                });
+
             event.preventDefault();
         });
+
+        $("#login").submit(function () {
+            var _data = {};
+            _data.usuario = $("#usuario").val();
+            _data.senha = $("#senha").val();
+            
+            postAjax("/" + this.id, 
+                _data, 
+                function(data) {
+                    $("#retorno_login").html(data);
+                    if (data == "validado!") {
+                        usuario = $("#usuario").val();
+                    }
+                }, function(errMsg) {
+                    alert(errMsg);
+                });
+
+            event.preventDefault();
+        });
+
+        function postAjax(_url, _data, _cbSuccess, _cbError) {
+            alert(JSON.stringify(_data));
+            $.ajax({
+                type: "POST",
+                url: _url,
+                data: JSON.stringify(_data),
+                //data: _data,
+                //dataType: "json",
+                contentType: 'application/json',
+                success: _cbSuccess,
+                failure: _cbError
+            });
+        }
         
         // on every message recived we print the new datas inside the #container div
         
