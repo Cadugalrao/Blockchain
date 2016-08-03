@@ -34,13 +34,13 @@ app.use(session({secret: 'AccentureCaduePlata'}));
 var server = require('http').Server(app);
 var sio = require('socket.io')(server);
 var io = null;
-const usernames = {};
-var redis   = require("redis");
-var client  = redis.createClient();
+const users = {};
+//var redis   = require("redis");
+//var client  = redis.createClient();
 
-client.on('connect', function() {
-    console.log('redis connected');
-});
+//client.on('connect', function() {
+//    console.log('redis connected');
+//});
 
 var socketObj;
 
@@ -72,46 +72,154 @@ sio.sockets.on('connection', (socket) => {
   });
 
   socket.on('adduser', (sessionID) => {
-    socket.sessionID = sessionID;
+    socket.username = sessionID;
+    var ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address;
+    
+    //client.sadd('sessoes', sessionID);
+    //client.hmset(sessionID, 'ip', ip, 'userName', "", 'socketId', socket.id, redis.print);
 
-    //usernames[username] = username;
+    users[sessionID] = {"ip": ip, "userName": "", "socketId": socket.id};
 
     socket.emit(
-      'servernotification', {
-        connected: true,
-        toSelf: true,
-        sessionID: sessionID
-      });
+        'servernotification', {
+            connected: true,
+            toSelf: true,
+            sessionID: sessionID
+        }
+    );
 
-    //socket.broadcast.emit('servernotification', { connected: true, sessionID: sessionID });
-
-    //sio.sockets.emit('updateusers', usernames);
-
-    console.log('adduser: ' + sessionID);
+    console.log('adduser->sessionID: ' + sessionID);
+    console.log('adduser->socket.id: ' + socket.id);
+    console.log('adduser->connected: ' + sio.sockets.connected[socket.id].connected);
   });
 
   socket.on('disconnect', () => {
-    delete usernames[socket.username];
+    delete users[socket.username];
 
-    sio.sockets.emit('updateusers', usernames);
+    //sio.sockets.emit('updateusers', usernames);
 
     socket.broadcast.emit('servernotification', { username: socket.username });
   });
 });
 
-function addUser(sessionID, ip, userName) {
-    if (client.sadd('sessoes', sessionID) == 1) {
-        client.hmset(sessionID, 'ip', ip, 'userName', userName)
-    } else {
-        var ip_aux = client.hmget(sessionID, 'ip');
-        var uerName_aux = client.hmget(sessionID, 'userName');
+function addUser(userName, req) {
+    if (!sessionValid(userName, req))
+        return false;
+    
+    users[req.sessionID].userName = userName;
+    return true;
+    
+    //var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    //client.sadd('sessoes', req.sessionID);
+    //client.hmset("aaa", 'ip', ip, 'userName', userName);
+    //client.hmset(req.sessionID, 'ip', ip, 'userName', userName);
+}
+
+function sessionValid(userName, req) {
+    var ip = req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+    
+    //if (client.hexists(req.sessionID, 'ip') == 1) {
+    if (users[req.sessionID].ip != "") {
+
+        var ip_aux = users[req.sessionID].ip;
+        var userName_aux = users[req.sessionID].userName;
         
-        if (ip_aux != ip || uerName_aux != uerName) {      
-            console.log("desconectar usuario");
+        if (ip_aux != ip || userName_aux != userName) {      
+            return false;
+        } else {
+            return true;
         }
+    } else {
+        return false;
     }
 }
 
+app.post('/consultar', urlencodedParser, function (req, res) {
+    if (!sessionValid("", req))
+        return false;
+    
+    // Prepare output in JSON format
+    /*
+    response = {
+        first_name:req.body.first_name,
+        last_name:req.body.last_name
+    };
+    */
+    
+    //web3_node1.setProvider(new web3_node1.providers.HttpProvider('http://ec2-52-50-42-100.eu-west-1.compute.amazonaws.com:80'));
+    web3_node1.setProvider(new web3_node1.providers.HttpProvider('http://localhost:8545'));
+    
+    var gestao_garantiasABI_o = web3_node1.eth.contract(gestao_garantiasABI);
+    var gestao_garantias = gestao_garantiasABI_o.at(gestao_garantiasAddress);
+
+    var total_loops = gestao_garantias.contador_garantia();
+    var mensagem = 'Total de registros: ' + total_loops;
+    res.send(mensagem + '\n');
+
+    //for (var i=total_loops; i > 0; i--) {
+
+    //socketObj.volatile.emit('notification', mensagem);
+    
+    var socketId = client.hget(req.sessionID, 'socketId');
+    sio.sockets.connected[socketId].emit('notification', mensagem);
+
+    console.log('consultar');
+});
+
+
+app.post('/cadastro', urlencodedParser, function (req, res) {
+    if (!sessionValid("", req))
+        return false;
+    
+    //web3_node1.setProvider(new web3_node1.providers.HttpProvider('http://ec2-52-50-42-100.eu-west-1.compute.amazonaws.com:80'));
+    web3_node1.setProvider(new web3_node1.providers.HttpProvider('http://localhost:8545'));
+    
+    var gestao_garantiasABI_o = web3_node1.eth.contract(gestao_garantiasABI);
+    var gestao_garantias = gestao_garantiasABI_o.at(gestao_garantiasAddress);
+
+    var total_loops = gestao_garantias.contador_garantia();
+    var mensagem = 'Total de registros: ' + total_loops;
+    res.send(mensagem + '\n');
+
+    //var socketId = client.hget(req.sessionID, "socketId");
+    //console.log('>>>>>>> ' + req.sessionID );
+    //console.log('>>>>>>> ' + client.hget(req.sessionID, "socketId") );
+    //var ip_aux = client.hget(req.sessionID, 'ip');
+    //console.log(ip_aux);
+    //sio.sockets.connected[socketId].emit('notification', mensagem);
+    sio.sockets.connected[users[req.sessionID].socketId].emit('notification', mensagem);
+
+    //console.log('pagina 2');
+});
+
+
+
+
+function parse_cookies(_cookies) {
+    var cookies = {};
+
+    _cookies && _cookies.split(';').forEach(function( cookie ) {
+        var parts = cookie.split('=');
+        cookies[ parts[ 0 ].trim() ] = ( parts[ 1 ] || '' ).trim();
+    });
+
+    return cookies;
+}
+
+
+
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////
 
 
 
@@ -146,68 +254,3 @@ io.sockets.on('connection', function (socket) {
 */
 
 // App
-
-
-app.post('/consultar', urlencodedParser, function (req, res) {
-    
-    // Prepare output in JSON format
-    /*
-    response = {
-        first_name:req.body.first_name,
-        last_name:req.body.last_name
-    };
-    */
-    
-    //web3_node1.setProvider(new web3_node1.providers.HttpProvider('http://ec2-52-50-42-100.eu-west-1.compute.amazonaws.com:80'));
-    web3_node1.setProvider(new web3_node1.providers.HttpProvider('http://localhost:8545'));
-    
-    var gestao_garantiasABI_o = web3_node1.eth.contract(gestao_garantiasABI);
-    var gestao_garantias = gestao_garantiasABI_o.at(gestao_garantiasAddress);
-
-    var total_loops = gestao_garantias.contador_garantia();
-    var mensagem = 'Total de registros: ' + total_loops;
-    res.send(mensagem + '\n');
-
-    //for (var i=total_loops; i > 0; i--) {
-
-    //socketObj.volatile.emit('notification', mensagem);
-    socketObj.emit('notification', mensagem);
-
-    console.log('pagina 2');
-});
-
-/*
-app.get('/send_transaction', function (req, res) {
-    var web3_node1 = new Web3();
-
-    //web3_node1.setProvider(new web3_node1.providers.HttpProvider('http://ec2-52-50-42-100.eu-west-1.compute.amazonaws.com:80'));
-    web3_node1.setProvider(new web3_node1.providers.HttpProvider('http://localhost:80'));
-    
-    var gestao_garantiasABI_o = web3_node1.eth.contract(gestao_garantiasABI);
-    var gestao_garantias = gestao_garantiasABI_o.at(gestao_garantiasAddress);
-
-    var total_loops = gestao_garantias.contador_garantia();
-    var mensagem = 'Total de registros: ' + total_loops;
-    res.send(mensagem + '\n');
-
-    //for (var i=total_loops; i > 0; i--) {
-
-    //socketObj.volatile.emit('notification', mensagem);
-    socketObj.emit('notification', mensagem);
-
-    console.log('pagina 2');
-});
-*/
-
-
-
-function parse_cookies(_cookies) {
-    var cookies = {};
-
-    _cookies && _cookies.split(';').forEach(function( cookie ) {
-        var parts = cookie.split('=');
-        cookies[ parts[ 0 ].trim() ] = ( parts[ 1 ] || '' ).trim();
-    });
-
-    return cookies;
-}
