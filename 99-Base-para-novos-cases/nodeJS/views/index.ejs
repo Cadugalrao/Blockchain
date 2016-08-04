@@ -8,25 +8,47 @@
     </head>
     <body>
         <form id="login">
-            Usuário: <input type="text" id="usuario"><br>
-            Senha: <input type="text" id="senha"><br>
+            Usuário: <input type="text" id="usuario" value="rodrigo"><br>
+            Senha: <input type="text" id="senha" value="plata"><br>
             <input type="submit" value="Enviar">
             <div id="retorno_login"></div>
         </form>
         <hr>
-        <form id="cadastro">
-            Garantia ID: <input type="text" id="garantia_id"><br>
-            Valor: <input type="text" id="valor"><br>
+        <form id="consulta">
+            Quantidade de operações:
+            <div id="retorno_consulta"></div>
             <input type="submit" value="Enviar">
-            <div id="retorno_cadastro"></div>
+        </form>
+        <hr>
+        <form id="cadastrar_operacao">
+            codigo_op: <input type="text" id="codigo_operacao"><br>
+            Valor: <input type="text" id="valor_operacao"><br>
+            <input type="submit" value="Enviar">
+            <div id="retorno_cadastrar_operacao"></div>
+        </form>
+        <hr>
+        <form id="cadastrar_duplicata">
+            codigo_op: <input type="text" id="codigo_op"><br>
+            chave_duplicata: <input type="text" id="chave_duplicata"><br>
+            cpf_cnpj_sacado: <input type="text" id="cpf_cnpj_sacado"><br>
+            cnpj_emissor: <input type="text" id="cnpj_emissor"><br>
+            Valor: <input type="text" id="valor_duplicata"><br>
+            situacao_nova_duplicata: <input type="text" id="situacao_nova_duplicata"><br>
+            <input type="submit" value="Enviar">
+            <div id="retorno_cadastro_duplicata"></div>
         </form>
         
-        <time></time>
-        <div id="container">Try to change your xml data to update this content</div>
+        retorno_sendTransaction:
+        <div id="retorno_sendTransaction"></div>
+        <hr>
+        container:
+        <div id="container"></div>
+        <!--
         <br><br>
         sessionID: <%= sessionID %>
         <br>
         IP:  <%= ip %>
+        -->
         <script>
         //var socket = io.connect('http://ec2-54-171-185-229.eu-west-1.compute.amazonaws.com');
         //var socket = io.connect('http://localhost:9090');
@@ -53,16 +75,52 @@
                { "position": "235.1944023323615", "markerPosition": "19" },
                { "position": "42.5978231292517", "markerPosition": "-3" }];*/
         
-        $("#cadastro").submit(function () {
+        $("#consulta").submit(function () {
             var _data = {};
-            _data.garantia_id = $("#garantia_id").val();
-            _data.valor = $("#valor").val();
             _data.usuario = usuario;
 
             postAjax("/" + this.id, 
                 _data, 
                 function(data) {
-                    $("#retorno_cadastro").html(data);
+                    $("#retorno_consulta").html(data.msg);
+                }, function(errMsg) {
+                    alert(errMsg);
+                });
+
+            event.preventDefault();
+        });
+        
+        $("#cadastrar_operacao").submit(function () {
+            var _data = {};
+            _data.codigo_operacao = $("#codigo_operacao").val();
+            _data.valor_operacao = $("#valor_operacao").val();
+            _data.usuario = usuario;
+
+            postAjax("/" + this.id, 
+                _data, 
+                function(data) {
+                    $("#retorno_cadastrar_operacao").html(data);
+                }, function(errMsg) {
+                    alert(errMsg);
+                });
+
+            event.preventDefault();
+        });
+        
+        $("#cadastrar_duplicata").submit(function () {
+            var _data = {};
+            _data.codigo_op = $("#codigo_op").val();
+            _data.chave_duplicata = $("#chave_duplicata").val();
+            _data.cpf_cnpj_sacado = $("#cpf_cnpj_sacado").val();
+            _data.cnpj_emissor = $("#cnpj_emissor").val();
+            _data.valor_duplicata = $("#valor_duplicata").val();
+            _data.situacao_nova_duplicata = $("#situacao_nova_duplicata").val();
+            _data.usuario = usuario;
+
+            postAjax("/" + this.id, 
+                _data, 
+                function(data) {
+                    $("#retorno_cadastrar_duplicata").html(data);
                 }, function(errMsg) {
                     alert(errMsg);
                 });
@@ -75,6 +133,7 @@
             _data.usuario = $("#usuario").val();
             _data.senha = $("#senha").val();
             
+            //alert(_data + '\n' + this.id);
             postAjax("/" + this.id, 
                 _data, 
                 function(data) {
@@ -90,7 +149,7 @@
         });
 
         function postAjax(_url, _data, _cbSuccess, _cbError) {
-            alert(JSON.stringify(_data));
+            //alert(JSON.stringify(_data));
             $.ajax({
                 type: "POST",
                 url: _url,
@@ -110,6 +169,11 @@
 
             $('#container').html(data);
             $('time').html('Last Update:' + new Date());
+        });
+        
+        
+        socket.on('retorno_sendTransaction', function (data) {
+            $('#retorno_sendTransaction').html(data);
         });
         
 
