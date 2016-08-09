@@ -1,0 +1,145 @@
+<link rel="shortcut icon" href="public/images/icon.ico">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><%= titulo%></title>
+<script src="public/debug.js"></script>
+<script src="public/web3.js"></script>
+<script src="public/bignumber.js"></script>
+<script src="public/mascara_cpf.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script>
+    //var socket = io.connect('http://ec2-54-171-185-229.eu-west-1.compute.amazonaws.com');
+    //var socket = io.connect('http://localhost:9090');
+    var socket = io.connect('/');
+    var usuario = "<%= userName %>";
+    
+    socket.on('connect', function () {
+        // call the server-side function 'adduser' and send one parameter (value of prompt)
+        socket.emit('adduser', '<%= sessionID %>');
+    });
+
+    socket.on('servernotification', function (data) {
+        //var searchUrl = searchUrlFor(data.username);
+
+        if (data.connected) {
+            if (data.toSelf) data.sessionID = 'you';
+            //$('#conversation').append('connected: <a href="' + searchUrl + '" target="_blank">' + escaped(data.username) + '</a><br/>');
+        } else {
+            //$('#conversation').append('disconnected: <a href="' + searchUrl + '" target="_blank">' + escaped(data.username) + '</a><br/>');
+        }
+    });
+
+    function postAjax(_url, _data, _cbSuccess, _cbError) {
+        //alert(JSON.stringify(_data));
+        $.ajax({
+            type: "POST",
+            url: _url,
+            data: JSON.stringify(_data),
+            //data: _data,
+            //dataType: "json",
+            contentType: 'application/json',
+            success: _cbSuccess,
+            failure: _cbError
+        });
+    }
+    
+    $(document).bind('mobileinit',function(){
+        $.mobile.changePage.defaults.changeHash = false;
+        $.mobile.hashListeningEnabled = false;
+        $.mobile.pushStateEnabled = false;
+    });
+    $.event.special.tap = {
+        tapholdThreshold: 750,
+
+        setup: function() {
+            var thisObject = this,
+                $this = $( thisObject );
+
+            $this.bind( "vmousedown", function( event ) {
+
+                if ( event.which && event.which !== 1 ) {
+                    return false;
+                }
+
+                var origTarget = event.target,
+                    origEvent = event.originalEvent,
+                    /****************Modified Here**************************/
+                    tapfired = false,
+                    timer;
+
+                function clearTapTimer() {
+                    clearTimeout( timer );
+                }
+
+                function clearTapHandlers() {
+                    clearTapTimer();
+
+                    $this.unbind( "vclick", clickHandler )
+                        .unbind( "vmouseup", clearTapTimer );
+                    $( document ).unbind( "vmousecancel", clearTapHandlers );
+                }
+
+                function clickHandler( event ) {
+                    clearTapHandlers();
+
+                    // ONLY trigger a 'tap' event if the start target is
+                    // the same as the stop target.
+                    /****************Modified Here**************************/
+                    //if ( origTarget === event.target) {
+                        if ( origTarget === event.target && !tapfired) {
+                            triggerCustomEvent( thisObject, "tap", event );
+                        }
+                }
+
+                $this.bind( "vmouseup", clearTapTimer )
+                    .bind( "vclick", clickHandler );
+                $( document ).bind( "vmousecancel", clearTapHandlers );
+
+                timer = setTimeout( function() {
+                    tapfired = true;/****************Modified Here**************************/
+                    triggerCustomEvent( thisObject, "taphold", $.Event( "taphold", { target: origTarget } ) );
+                }, $.event.special.tap.tapholdThreshold );
+            });
+        }
+    };
+</script>
+<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+<script src="public/jquery-ui.js"></script>
+
+<script src="public/jquery.number.js"></script>
+<script src="public/config.js"></script>
+<script src="public/utils.js"></script>
+<link rel="stylesheet" href="public/style.css">
+<script type="text/javascript">
+    var Web3 = require('web3');
+    var web3 = new Web3();
+
+    $( document ).ready(function() {
+        
+        $("#login").submit(function () {
+            var _data = {};
+            _data.usuario = $("#usuario").val();
+            _data.senha = $("#senha").val();
+            
+            //alert(_data + '\n' + this.id);
+            postAjax("/" + this.id, 
+                _data, 
+                function(data) {
+                    //$("#retorno_login").html(data);
+                    if (data.sucesso) {
+                        location.reload();
+                    }
+                }, function(errMsg) {
+                    alert(errMsg);
+                });
+
+            event.preventDefault();
+        });
+
+        if (usuario.length > 0)
+            main();
+    });
+</script>

@@ -207,7 +207,8 @@ app.post('/cadastrar_operacao', urlencodedParser, function (req, res) {
     
     if (!sessionValid(req.body.usuario, req)) {
         retorno.msg = "usuário inválido!";
-        retorno.msgTecnica = "sessionValid -> req.body.usuario = " + req.body.usuario;
+        retorno.msgTecnica = "/cadastrar_operacao >> sessionValid -> req.body.usuario = " + req.body.usuario;
+        console.log(">>>>> " + retorno.msgTecnica);
         res.end(retorno);
         return;
     }
@@ -223,8 +224,9 @@ app.post('/cadastrar_operacao', urlencodedParser, function (req, res) {
     }
     
     if (!retorno.sucesso) {
-        retorno.msg = "Verifique o(s) erro(s) abaixo:\n";
+        retorno.msg = "Verifique o(s) erro(s) abaixo:\n" + retorno.msg;
         res.end(JSON.stringify(retorno));
+        console.log(">>>> cadastrar_operacao >> ponto 1.5 >> retorno.msg = " + retorno.msg);
         return;
     }
 
@@ -261,9 +263,9 @@ app.post('/cadastrar_operacao', urlencodedParser, function (req, res) {
                 retorno.dados_operacao.valor_operacao = valor_operacao;
                 
                 txHashs[txHash] = users[req.sessionID].socketId; //utilizado para que o eventoi possa dar o retorno para o client correto.
-                console.log('>>>>> app.post >> /cadastrar_operacao >> req.sessionID = ' + req.sessionID);
-                console.log('>>>>> app.post >> /cadastrar_operacao >> users[req.sessionID].socketId = ' + users[req.sessionID].socketId);
-                console.log('>>>>> app.post >> /cadastrar_operacao >> txHashs[txHash] = ' + txHashs[txHash]);
+                //console.log('>>>>> app.post >> /cadastrar_operacao >> req.sessionID = ' + req.sessionID);
+                //console.log('>>>>> app.post >> /cadastrar_operacao >> users[req.sessionID].socketId = ' + users[req.sessionID].socketId);
+                //console.log('>>>>> app.post >> /cadastrar_operacao >> txHashs[txHash] = ' + txHashs[txHash]);
 
                 res.end(JSON.stringify(retorno));
             }
@@ -293,7 +295,7 @@ gestao_duplicatas.ret_incluir_operacao(function(error, result){
     retorno.dados_operacao.valor_atualizado = result.args.valor;
     
     if (error != null) {
-        retorno.msgTecnica = "Codigo do erro: " + esult.args.cod_erro;
+        retorno.msgTecnica = "Codigo do erro: " + result.args.cod_erro;
         retorno.sucesso_alt_blockchain = false;
     
     } else {
@@ -306,13 +308,6 @@ gestao_duplicatas.ret_incluir_operacao(function(error, result){
 });
 
 app.post('/cadastrar_duplicata', urlencodedParser, function (req, res) {
-    if (!sessionValid(req.body.usuario, req)) {
-        res.end("usuário inválido!");
-        return false;
-    }
-
-    res.writeHead("200", {"Content-Type": "application/json"});
-        
     var codigo_op = req.body.codigo_op;
     var chave_duplicata = req.body.chave_duplicata;
     var cpf_cnpj_sacado = formata_numero_subida(req.body.cpf_cnpj_sacado);
@@ -321,13 +316,13 @@ app.post('/cadastrar_duplicata', urlencodedParser, function (req, res) {
     var situacao_nova_duplicata = req.body.situacao_nova_duplicata;
     
     var retorno = {};
+    retorno.funcao = "Inclus&atilde;o de duplicata";
     retorno.msg = "";
     retorno.msgTecnica = "";
-    retorno.sucesso = "";
+    retorno.sucesso = true;
     retorno.txHash = "";
-    retorno.retornoApresentado = "";
-    retorno.funcao = "Inclus&atilde;o de duplicata";
-    retorno.sucesso_alt_blockchain = "";
+    retorno.retornoApresentado = false;
+    retorno.sucesso_alt_blockchain = false;
     retorno.mensagem_blockchain = "";
     retorno.dados_duplicata = {};
     retorno.dados_duplicata.chave = chave_duplicata;
@@ -336,59 +331,70 @@ app.post('/cadastrar_duplicata', urlencodedParser, function (req, res) {
     retorno.dados_duplicata.cnpj_emissor = cnpj_emissor;
     retorno.dados_duplicata.valor_duplicata = valor_duplicata;
     retorno.dados_duplicata.situacao_nova_duplicata = situacao_nova_duplicata;
+    
+    res.writeHead("200", {"Content-Type": "application/json"});
+    
+    if (!sessionValid(req.body.usuario, req)) {
+        retorno.msg = "usuário inválido!";
+        retorno.msgTecnica = "/cadastrar_duplicata >> sessionValid -> req.body.usuario = " + req.body.usuario;
+        console.log(">>>>> " + retorno.msgTecnica);
+        res.end(retorno);
+        return false;
+    }
 
     if (!validacao_simples(codigo_op)) {
         retorno.msg += "Código da opração: inválido\n";
-        retorno.sucesso = "false";
+        retorno.sucesso = false;
     }
     
-    if (chave_duplicata.trim().length == 0) {
+    if (!validacao_simples(chave_duplicata)) {
         retorno.msg += "Chave: inválida\n";
-        retorno.sucesso = "false";
+        retorno.sucesso = false;
     }
     
     if (!validacao_simples(req.body.cpf_cnpj_sacado)) {
         retorno.msg += "CPF ou CNPJ da Sacado: inválido\n";
-        retorno.sucesso = "false";
+        retorno.sucesso = false;
     }
         
     if (!validacao_simples(req.body.cnpj_emissor)) {
         retorno.msg += "CNPJ do emissor: inválido\n";
-        retorno.sucesso = "false";
+        retorno.sucesso = false;
     }
     
     if (!validacao_simples(req.body.valor_duplicata)) {
         retorno.msg += "Valor: inválido\n";
-        retorno.sucesso = "false";
+        retorno.sucesso = false;
     }
 
     if (situacao_nova_duplicata.trim().length == 0) {
         retorno.msg += "Situacao da nova duplicata: inválida\n";
-        retorno.sucesso = "false";
+        retorno.sucesso = false;
     }
     
     if (!retorno.sucesso) {
-        retorno.msg = "Verifique o(s) erro(s) abaixo:\n";
-        res.end(retorno);
+        retorno.msg = "Verifique o(s) erro(s) abaixo:\n" + retorno.msg;
+        res.end(JSON.stringify(retorno));
+        console.log(">>>> cadastrar_duplicata >> ponto 1.5 >> retorno.msg = " + retorno.msg);
         return;
     }
+
+    console.log(">>>> cadastrar_duplicata >> ponto 2");
     
     var chave_duplicata_big = new BigNumber(chave_duplicata, 10);
     var cnpj_emissor_big = new BigNumber(cnpj_emissor, 10);
     var cpf_cnpj_sacado_big = new BigNumber(cpf_cnpj_sacado, 10);
 
     valor_duplicata = formata_valor_subida(valor_duplicata);
-
     
     gestao_duplicatas.incluir_duplicata.sendTransaction(chave_duplicata_big, cnpj_emissor_big, cpf_cnpj_sacado_big, valor_duplicata, situacao_nova_duplicata, codigo_op, {
 		from: web3_node1.eth.coinbase, gas: 3500000 }, function(err, txHash) {
             if (err != null) {
                 retorno.msg = "Erro ao tentar incluir uma duplicata";
                 retorno.msgTecnica = "gestao_duplicatas.incluir_duplicata.sendTransaction => " + err;
-                retorno.sucesso = "false";
+                retorno.sucesso = false;
                 retorno.txHash = txHash;
-                retorno.retornoApresentado = "false";
-                retorno.funcao = "Inclus&atilde;o de duplicata";
+                retorno.retornoApresentado = false;
                 retorno.sucesso_alt_blockchain = "";
                 retorno.mensagem_blockchain = "";
                 retorno.dados_duplicata = {};
@@ -402,10 +408,10 @@ app.post('/cadastrar_duplicata', urlencodedParser, function (req, res) {
                 res.end(retorno);
             } else {
                 retorno.msg = "Em andamento a minera&ccedil;&atilde;o da nova duplicata";
+                console.log(">>>> cadastrar_operacao >> retorno.msg: " + retorno.msg);
                 retorno.sucesso = true;
                 retorno.txHash = txHash;
-                retorno.retornoApresentado = "false";
-                retorno.funcao = "Inclus&atilde;o de duplicata";
+                retorno.retornoApresentado = false;
                 retorno.sucesso_alt_blockchain = "";
                 retorno.mensagem_blockchain = "";
                 retorno.dados_duplicata = {};
@@ -415,8 +421,10 @@ app.post('/cadastrar_duplicata', urlencodedParser, function (req, res) {
                 retorno.dados_duplicata.cnpj_emissor = cnpj_emissor;
                 retorno.dados_duplicata.valor_duplicata = valor_duplicata;
                 retorno.dados_duplicata.situacao_nova_duplicata = situacao_nova_duplicata;
+
+                txHashs[txHash] = users[req.sessionID].socketId; //utilizado para que o eventoi possa dar o retorno para o client correto.
                 
-                res.end(retorno);
+                res.end(JSON.stringify(retorno));
             }
         }
     );
@@ -425,6 +433,40 @@ app.post('/cadastrar_duplicata', urlencodedParser, function (req, res) {
     console.log('>>>>> app.post >> /cadastrar_duplicata');
 });
 
+//event ret_incluir_duplicata(uint chave, uint cnpj_emissor, uint cpf_cnpj_sacado, uint64 valor, uint8 situacao, string codigo_op, uint index_alocacao, int cod_erro, string descricao);
+gestao_duplicatas.ret_alterar_duplicata(function(error, result){
+    console.log('>>>>> event gestao_duplicatas.ret_alterar_duplicata >> evento recebido do GETH e enviado para o client >> ponto 1');
+    var retorno = {};
+    
+    retorno.msg = "";
+    retorno.txHash = result.transactionHash;
+    console.log('>>>>> event gestao_duplicatas.ret_alterar_duplicata >> ponto 2 >> result.transactionHash = ' + result.transactionHash);
+    console.log('>>>>> event gestao_duplicatas.ret_alterar_duplicata >> ponto 3 >> txHashs[result.transactionHash] = ' + txHashs[result.transactionHash]);
+    retorno.retornoApresentado = false;
+    retorno.funcao = "Inclus&atilde;o de operação";
+    retorno.mensagem_blockchain = result.args.descricao;
+    retorno.cod_erro = result.args.cod_erro;
+    retorno.dados_duplicata = {};
+    retorno.dados_duplicata.chave = result.args.chave;
+    retorno.dados_duplicata.codigo_op = result.args.codigo_op;
+    retorno.dados_duplicata.index_alocacao = result.args.index_alocacao;
+    retorno.dados_duplicata.cpf_cnpj_sacado = result.args.cpf_cnpj_sacado;
+    retorno.dados_duplicata.cnpj_emissor = result.args.cnpj_emissor;
+    retorno.dados_duplicata.valor_duplicata = result.args.valor;
+    retorno.dados_duplicata.situacao_nova_duplicata = result.args.situacao;
+    
+    if (error != null) {
+        retorno.msgTecnica = "Codigo do erro: " + result.args.cod_erro + '\n descricao: ' + result.args.descricao;
+        retorno.sucesso_alt_blockchain = false;
+    
+    } else {
+        var cod_erro = parseInt(result.args.cod_erro);
+        retorno.sucesso_alt_blockchain = ((cod_erro < 0) ? true : false);
+    }
+
+    sio.sockets.connected[txHashs[result.transactionHash]].emit('retorno_sendTransaction', JSON.stringify(retorno));
+    console.log('>>>>> event gestao_duplicatas.ret_alterar_duplicata >> evento recebido do GETH e enviado para o client >> ponto 2');
+});
 
 function validacao_simples(dado) {
     console.log(">>>> validacao_simples >> ponto 1 >> " + dado);

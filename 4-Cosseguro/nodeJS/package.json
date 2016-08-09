@@ -1,0 +1,29 @@
+{
+  "name": "geth-app",
+  "version": "1.0.0",
+  "description": "aplicacao base para as provas de conceito de net it",
+  "main": "gethApp.js",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "ejs": "^2.5.1",
+    "express": "^4.14.0",
+    "jsonwebtoken": "^7.1.7",
+    "redis": "^2.6.2",
+    "socketio-jwt": "^4.5.0",
+    "socket.io": "^1.4.8",
+    "xmlhttprequest-ssl": "^1.5.2",
+    "web3": "^0.17.0-alpha",
+    "big-number": "^0.4.0",
+    "express-session": "^1.14.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Cadugalrao/Blockchain/tree/master/99-Base-para-novos-cases"
+  },
+  "author": "Rodrigo S. Plata e Carlos E. Galrao",
+  "license": "ISC"
+}

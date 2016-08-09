@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <% include partials/head %>
+    </head>
+    <body style="width: 300px;">
+        <% if (userName == "") { %>
+        <% include partials/login %>
+        <% } else { %>
+        <div id="page-app">
+            <% include partials/menu %>
+            <div id="master-container" style="display:none;">
+                <% include partials/eventos %>
+                <% include partials/sobra_falta %>
+                <% include partials/acordo %>
+                <% include partials/apolice %>
+            </div>
+        </div>
+        <% } %>
+        <% include partials/rodape %>
+    </body>
+</html>
