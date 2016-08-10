@@ -20,9 +20,9 @@ if(1==1) {
 		}
 		
 
-        var diasParaVencimento = 30;
+        var diasParaVencimento = 40;
 		// passando um parametro de entrada
-		obj_funcao.sendTransaction("codigo da apolice", 11111, 222222222, Date.now() + diasParaVencimento * 24 * 60 * 60,
+		obj_funcao.sendTransaction("codigo da apolice2", 33333, 4444444, Date.now() + diasParaVencimento * 24 * 60 * 60,
 			{from: eth.accounts[0], gas: 3500000}, 
 			function (err, result) {
 				if (err) {

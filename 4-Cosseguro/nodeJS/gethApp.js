@@ -17,9 +17,9 @@ web3_node1.setProvider(new web3_node1.providers.HttpProvider('http://localhost:8
 //web3_node3.setProvider(new web3_node1.providers.HttpProvider('http://localhost:8545'));
 //web3_node4.setProvider(new web3_node1.providers.HttpProvider('http://localhost:8545'));
 
-var cosseguroABI = [{"constant":true,"inputs":[{"name":"_adress_aux","type":"address"},{"name":"_index_acordo","type":"uint256"}],"name":"consultar_acordo","outputs":[{"name":"","type":"uint256"},{"name":"","type":"uint64"},{"name":"","type":"bool"}],"type":"function"},{"constant":true,"inputs":[],"name":"contar_apolices","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[{"name":"_index_apolice","type":"uint256"},{"name":"_index_seguradora","type":"uint256"}],"name":"consultar_apolice_seguradora","outputs":[{"name":"","type":"string"},{"name":"","type":"uint64"},{"name":"","type":"uint64"},{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"address"},{"name":"","type":"uint16"}],"type":"function"},{"constant":false,"inputs":[{"name":"_index_apolice_cedido","type":"uint256"},{"name":"_index_acordo_aceito","type":"uint256"},{"name":"_addr_cedido","type":"address"}],"name":"autorizar_acordo","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_a","type":"string"},{"name":"_b","type":"string"}],"name":"compare","outputs":[{"name":"","type":"int256"}],"type":"function"},{"constant":false,"inputs":[{"name":"_a","type":"string"},{"name":"_b","type":"string"}],"name":"equal","outputs":[{"name":"","type":"bool"}],"type":"function"},{"constant":true,"inputs":[{"name":"_index_apolice","type":"uint256"}],"name":"consultar_apolice","outputs":[{"name":"","type":"string"},{"name":"","type":"uint64"},{"name":"","type":"uint64"},{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"address"},{"name":"","type":"uint256"},{"name":"","type":"address"},{"name":"","type":"uint256"},{"name":"","type":"address"},{"name":"","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[{"name":"_index_apolice","type":"uint256"}],"name":"contar_seguradoras","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"_haystack","type":"string"},{"name":"_needle","type":"string"}],"name":"indexOf","outputs":[{"name":"","type":"int256"}],"type":"function"},{"constant":false,"inputs":[{"name":"_index_apolice","type":"uint256"},{"name":"_percent_acordo","type":"uint16"},{"name":"_addr_seguradora_aceito","type":"address"}],"name":"incluir_acordo","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_codigo","type":"string"},{"name":"_premio","type":"uint64"},{"name":"_cobertura","type":"uint64"},{"name":"_dt_vencimento","type":"uint256"}],"name":"incluir_apolice","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"_index_acordo","type":"uint256"}],"name":"consultar_acordo","outputs":[{"name":"","type":"uint256"},{"name":"","type":"uint64"},{"name":"","type":"bool"}],"type":"function"},{"inputs":[],"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"codigo","type":"string"},{"indexed":false,"name":"premio","type":"uint64"},{"indexed":false,"name":"cobertura","type":"uint64"},{"indexed":false,"name":"dt_vencimento","type":"uint256"},{"indexed":false,"name":"qtde_seguradoras","type":"uint256"},{"indexed":false,"name":"index_array_apolice","type":"uint256"},{"indexed":false,"name":"index_array_seguradoras","type":"uint256"},{"indexed":false,"name":"index_array_acordo","type":"uint256"},{"indexed":false,"name":"sucesso","type":"bool"},{"indexed":false,"name":"cod_retorno","type":"int256"},{"indexed":false,"name":"descricao","type":"string"}],"name":"ret_incluir_apolice","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"index_apolice","type":"uint256"},{"indexed":false,"name":"percent_acordo","type":"uint64"},{"indexed":false,"name":"addr_seguradora_aceito","type":"address"},{"indexed":false,"name":"index_array_acordo","type":"uint256"},{"indexed":false,"name":"sucesso","type":"bool"},{"indexed":false,"name":"cod_retorno","type":"int256"},{"indexed":false,"name":"descricao","type":"string"}],"name":"ret_incluir_acordo","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"index_apolice_cedido","type":"uint256"},{"indexed":false,"name":"index_acordo_aceito","type":"uint256"},{"indexed":false,"name":"addr_cedido","type":"address"},{"indexed":false,"name":"sucesso","type":"bool"},{"indexed":false,"name":"cod_retorno","type":"int256"},{"indexed":false,"name":"descricao","type":"string"}],"name":"ret_autorizar_acordo","type":"event"}];
+var cosseguroABI = [{"constant":true,"inputs":[],"name":"contar_apolices","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[{"name":"_index_apolice","type":"uint256"},{"name":"_index_seguradora","type":"uint256"}],"name":"consultar_apolice_seguradora","outputs":[{"name":"","type":"string"},{"name":"","type":"uint64"},{"name":"","type":"uint64"},{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"address"},{"name":"","type":"uint16"}],"type":"function"},{"constant":false,"inputs":[{"name":"_index_apolice_cedido","type":"uint256"},{"name":"_index_acordo_aceito","type":"uint256"},{"name":"_addr_cedido","type":"address"}],"name":"autorizar_acordo","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_a","type":"string"},{"name":"_b","type":"string"}],"name":"compare","outputs":[{"name":"","type":"int256"}],"type":"function"},{"constant":false,"inputs":[{"name":"_a","type":"string"},{"name":"_b","type":"string"}],"name":"equal","outputs":[{"name":"","type":"bool"}],"type":"function"},{"constant":true,"inputs":[{"name":"_adress_aux","type":"address"},{"name":"_index_acordo","type":"uint256"}],"name":"apagar_consultar_acordo_aux","outputs":[{"name":"","type":"uint256"},{"name":"","type":"uint64"},{"name":"","type":"bool"}],"type":"function"},{"constant":true,"inputs":[{"name":"_index_apolice","type":"uint256"}],"name":"contar_index_acordo","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[{"name":"_index_apolice","type":"uint256"}],"name":"consultar_apolice","outputs":[{"name":"","type":"string"},{"name":"","type":"uint64"},{"name":"","type":"uint64"},{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"address"},{"name":"","type":"uint256"},{"name":"","type":"address"},{"name":"","type":"uint256"},{"name":"","type":"address"},{"name":"","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[{"name":"_index_apolice","type":"uint256"}],"name":"contar_seguradoras","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"_haystack","type":"string"},{"name":"_needle","type":"string"}],"name":"indexOf","outputs":[{"name":"","type":"int256"}],"type":"function"},{"constant":false,"inputs":[{"name":"_index_apolice","type":"uint256"},{"name":"_percent_acordo","type":"uint16"},{"name":"_addr_seguradora_aceito","type":"address"}],"name":"incluir_acordo","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"_index_apolice","type":"uint256"},{"name":"_index_acordo","type":"uint256"}],"name":"apagar_consultar_index_acordo","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[{"name":"_index_apolice","type":"uint256"}],"name":"apagar_consultar_apolice_aux","outputs":[{"name":"","type":"string"},{"name":"","type":"uint64"},{"name":"","type":"uint64"},{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"address"},{"name":"","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[{"name":"_index_apolice","type":"uint256"},{"name":"_adress_aux","type":"address"},{"name":"_index_acordo","type":"uint256"}],"name":"consultar_acordo_aceito","outputs":[{"name":"","type":"uint64"},{"name":"","type":"bool"}],"type":"function"},{"constant":false,"inputs":[{"name":"_codigo","type":"string"},{"name":"_premio","type":"uint64"},{"name":"_cobertura","type":"uint64"},{"name":"_dt_vencimento","type":"uint256"}],"name":"incluir_apolice","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"_index_acordo","type":"uint256"}],"name":"consultar_acordo","outputs":[{"name":"","type":"uint256"},{"name":"","type":"uint64"},{"name":"","type":"bool"}],"type":"function"},{"inputs":[],"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"codigo","type":"string"},{"indexed":false,"name":"premio","type":"uint64"},{"indexed":false,"name":"cobertura","type":"uint64"},{"indexed":false,"name":"dt_vencimento","type":"uint256"},{"indexed":false,"name":"qtde_seguradoras","type":"uint256"},{"indexed":false,"name":"index_array_apolice","type":"uint256"},{"indexed":false,"name":"index_array_seguradoras","type":"uint256"},{"indexed":false,"name":"index_array_acordo","type":"uint256"},{"indexed":false,"name":"sucesso","type":"bool"},{"indexed":false,"name":"cod_retorno","type":"int256"},{"indexed":false,"name":"descricao","type":"string"}],"name":"ret_incluir_apolice","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"index_apolice","type":"uint256"},{"indexed":false,"name":"percent_acordo","type":"uint64"},{"indexed":false,"name":"addr_seguradora_aceito","type":"address"},{"indexed":false,"name":"index_array_acordo","type":"uint256"},{"indexed":false,"name":"sucesso","type":"bool"},{"indexed":false,"name":"cod_retorno","type":"int256"},{"indexed":false,"name":"descricao","type":"string"}],"name":"ret_incluir_acordo","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"index_apolice_cedido","type":"uint256"},{"indexed":false,"name":"index_acordo_aceito","type":"uint256"},{"indexed":false,"name":"addr_cedido","type":"address"},{"indexed":false,"name":"sucesso","type":"bool"},{"indexed":false,"name":"cod_retorno","type":"int256"},{"indexed":false,"name":"descricao","type":"string"}],"name":"ret_autorizar_acordo","type":"event"}];
 
-const cosseguroAddress = "0xe3c88eeea579926792fec2e2a7ee18db4fd37f83"; //localhost
+const cosseguroAddress = "0x6d854a86e70149c0c8f5277e56a322545a49a7ac"; //localhost
 
 var cosseguroABI_o = web3_node1.eth.contract(cosseguroABI);
 var cosseguro = cosseguroABI_o.at(cosseguroAddress);
@@ -695,24 +695,88 @@ app.post('/consultar_blockchain', urlencodedParser, function (req, res) {
     console.log('>>>>> app.post >> /consultar_blockchain >> ponto 2');
 
     var total_apolices = cosseguro.contar_apolices();
-    console.log('>>>>> app.post >> /consultar_blockchain >> ponto 3 >> total_apolices = ' + total_apolices);
-
-    var total_acordos = 0;//cosseguro.contar_apolices();
+    var arr_apolices = [];
     for (var iA = 0; iA < total_apolices; iA++) {
-        var apolice = cosseguro.consultar_apolice(iA);
-        console.log('>>>>> app.post >> /consultar_blockchain >> ponto 4 >> apolice['+ iA +'] = ' + JSON.stringify(apolice));
-        //total_acordos = cosseguro.contar
+        arr_apolices[iA] = cosseguro.consultar_apolice(iA);
+        console.log('>>>>> app.post >> /consultar_blockchain >> ponto 4 >> apolice['+ iA +'] = ' + JSON.stringify(arr_apolices[iA]));
     }
     console.log('>>>>> app.post >> /consultar_blockchain >> ponto 5');
+
+    var json_aux = '{';
+	json_aux += '"apolices":[';
+	var arr_aux_acordo = [];
+	var arr_aux_apolice = [];
+
+	var virgula_acordo = '';
+	var virgula_apolice = '';
+
+	for (var iApolices=0; iApolices < arr_apolices.length; iApolices++) {
+        console.log('>>>>> app.post >> /consultar_blockchain >> ponto de montagem 1 >> iApolices = ' + iApolices);
+		var dados_apolice = arr_apolices[iApolices];
+		arr_aux_apolice = dados_apolice.toString().split(",");
+
+        console.log('>>>>> app.post >> /consultar_blockchain >> ponto de montagem 2 >> dados_apolice = ' + JSON.stringify(dados_apolice));
+
+		var codigo_op_aux = arr_aux_apolice[0].replace(/[^\x20-\x7E]+/g, '') + "";
+		var valor_premio = arr_aux_apolice[1];
+		var valor_cobertura = arr_aux_apolice[2];
+		var dt_vencimento = arr_aux_apolice[3];
+
+		json_aux += virgula_apolice;
+		json_aux += '{';
+		json_aux += '"codigo_op":"' + codigo_op_aux + '",';
+		json_aux += '"valor_premio":"' + valor_premio + '",';
+		json_aux += '"valor_cobertura":"' + valor_cobertura + '",';
+		json_aux += '"dt_vencimento":"' + dt_vencimento + '",';
+
+		json_aux += '"acordos":[';
+
+        var total_seguradoras = cosseguro.contar_seguradoras(iApolices);
+
+        console.log('>>>>> app.post >> /consultar_blockchain >> ponto de montagem 3 >> total_seguradoras = ' + total_seguradoras);
+
+		for (var iSeguradoras=0; iSeguradoras < total_seguradoras; iSeguradoras++) {
+
+            var dados_seguradora = cosseguro.consultar_apolice_seguradora(iApolices, iSeguradoras);
+            console.log('>>>>> app.post >> /consultar_blockchain >> ponto de montagem 4 >> dados_seguradora = ' + JSON.stringify(dados_seguradora));
+
+    		var arr_aux_seguradora = dados_seguradora.toString().split(",");
+            var addr_seguradora = arr_aux_seguradora[5];
+            var index_acordo = arr_aux_seguradora[6];
+
+            var dados_acordo = cosseguro.consultar_acordo_aceito(iApolices, addr_seguradora, index_acordo);
+            console.log('>>>>> app.post >> /consultar_blockchain >> ponto de montagem 5 >> dados_acordo = ' + JSON.stringify(dados_acordo));
+
+            arr_aux_acordo = dados_acordo.toString().split(",");
+            
+            var percent = arr_aux_acordo[0];
+            var autorizado = arr_aux_acordo[1];
+
+            json_aux += virgula_acordo;
+            json_aux += '{';
+            json_aux += '"addr_seguradora":"' + addr_seguradora + '",';
+            json_aux += '"percent":"' + percent + '",';
+            json_aux += '"autorizado":"' + autorizado + '"';
+            json_aux += '}';
+            virgula_acordo = ',';
+            console.log('>>>>> app.post >> /consultar_blockchain >> ponto de montagem 6 >> iSeguradoras = ' + iSeguradoras);
+        }
+        
+		json_aux += ']';
+		json_aux += '}';
+
+		virgula_apolice = ',';
+		virgula_acordo = '';
+	}
+	json_aux += ']';
+	json_aux += '}';
     
-    /*
-    console.log('>>>>> app.post >> /consultar_blockchain >> ponto 2 >> ' + req.body.usuario);
+    console.log('>>>>> app.post >> /consultar_blockchain >> ponto de montagem 6 >> json_aux = ' + json_aux);
 
-    var total_operacoes = cosseguro.contar_operacoes();
-    retorno.msg = "Total de opreções: " + total_operacoes;
+    retorno.blockchain = JSON.parse(json_aux);
 
-    console.log('>>>>> app.post >> /consultar_blockchain >> ponto 3 >> ' + total_operacoes);
-    */
+    console.log('>>>>> app.post >> /consultar_blockchain >> ponto de montagem 6 >> json_aux = ' + JSON.stringify(retorno.blockchain));
+
     res.end(JSON.stringify(retorno));
     //sio.sockets.connected[users[req.sessionID].socketId].emit('notification', JSON.stringify(retorno));
     

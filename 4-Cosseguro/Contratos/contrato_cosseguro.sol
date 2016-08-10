@@ -17,6 +17,7 @@ contract Cosseguro
         uint64 premio;
         uint64 cobertura;
         uint dt_vencimento;
+        address owner;
         address[] addr_seguradora;
         uint[] index_acordo;
     }
@@ -39,6 +40,7 @@ contract Cosseguro
             apolice_aux.premio = _premio;
             apolice_aux.cobertura = _cobertura;
             apolice_aux.dt_vencimento = _dt_vencimento;
+            apolice_aux.owner = msg.sender;
 
             uint index_array_seguradoras = apolice_aux.addr_seguradora.push(msg.sender);
 
@@ -121,50 +123,37 @@ contract Cosseguro
     function consultar_apolice(uint _index_apolice) constant returns (string, uint64, uint64, uint, uint, address, uint, address, uint, address, uint) {
         Apolice memory apolice_aux = apolices[_index_apolice];
 
-        uint qtde_seguradoras = apolice_aux.addr_seguradora.length + 1;
+        uint qtde_seguradoras = apolice_aux.addr_seguradora.length;
 
-        if (qtde_seguradoras == 3) {
+        if (qtde_seguradoras == 3 && apolice_aux.owner == msg.sender) {
             return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.cobertura, apolice_aux.dt_vencimento, qtde_seguradoras, apolice_aux.addr_seguradora[0], acordos[apolice_aux.addr_seguradora[0]].percent[apolice_aux.index_acordo[0]], apolice_aux.addr_seguradora[1], acordos[apolice_aux.addr_seguradora[1]].percent[apolice_aux.index_acordo[1]], apolice_aux.addr_seguradora[2], acordos[apolice_aux.addr_seguradora[2]].percent[apolice_aux.index_acordo[2]]);    
-        } else if (qtde_seguradoras == 2) {
+        } else if (qtde_seguradoras == 2 && apolice_aux.owner == msg.sender) {
             return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.cobertura, apolice_aux.dt_vencimento, qtde_seguradoras, apolice_aux.addr_seguradora[0], acordos[apolice_aux.addr_seguradora[0]].percent[apolice_aux.index_acordo[0]], apolice_aux.addr_seguradora[1], acordos[apolice_aux.addr_seguradora[1]].percent[apolice_aux.index_acordo[1]], 0, 0);    
-        } else  if (qtde_seguradoras == 1) {
+        } else  if (qtde_seguradoras == 1 && apolice_aux.owner == msg.sender) {
             return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.cobertura, apolice_aux.dt_vencimento, qtde_seguradoras, apolice_aux.addr_seguradora[0], apolice_aux.index_acordo[0], 0, 0, 0, 0);    
-        } else {
+        } else if (apolice_aux.owner == msg.sender) {
             return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.cobertura, apolice_aux.dt_vencimento, qtde_seguradoras, 0, 0, 0, 0, 0, 0);
+        } else {
+            return ("", 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
         }
     }
 
     function consultar_apolice_seguradora(uint _index_apolice, uint _index_seguradora) constant returns (string, uint64, uint64, uint, uint, address, uint16) {
         Apolice memory apolice_aux = apolices[_index_apolice];
         
-
-        uint qtde_seguradoras = apolice_aux.addr_seguradora.length + 1;
-
-        if (_index_seguradora >= apolice_aux.addr_seguradora.length) {
-            return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.cobertura, apolice_aux.dt_vencimento, qtde_seguradoras, 0, 0);
+        if (apolice_aux.owner != msg.sender) {
+            return ("", 0, 0, 0, 0, 0, 0);
         } else {
-            address addr_seguradora_aux = apolice_aux.addr_seguradora[_index_seguradora];
-            Acordo memory acordo_aux = acordos[addr_seguradora_aux];
-            uint index_acordo_aux =  apolice_aux.index_acordo[_index_seguradora];
-            //return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.cobertura, apolice_aux.dt_vencimento, qtde_seguradoras, addr_seguradora_aux, acordo_aux.percent[index_acordo_aux]);
-            return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.cobertura, apolice_aux.dt_vencimento, qtde_seguradoras, addr_seguradora_aux, 0);
-        }
-    }
+            uint qtde_seguradoras = apolice_aux.addr_seguradora.length;
 
-    function consultar_apolice_seguradora2(uint _index_apolice, uint _index_seguradora) constant returns (string, uint64, uint64, uint, uint, address, uint16) {
-        Apolice memory apolice_aux = apolices[_index_apolice];
-        
-
-        uint qtde_seguradoras = apolice_aux.addr_seguradora.length + 1;
-
-        if (_index_seguradora >= apolice_aux.addr_seguradora.length) {
-            return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.cobertura, apolice_aux.dt_vencimento, qtde_seguradoras, 0, 0);
-        } else {
-            address addr_seguradora_aux = apolice_aux.addr_seguradora[_index_seguradora];
-            Acordo memory acordo_aux = acordos[addr_seguradora_aux];
-            uint index_acordo_aux =  apolice_aux.index_acordo[_index_seguradora];
-            return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.cobertura, apolice_aux.dt_vencimento, qtde_seguradoras, addr_seguradora_aux, acordo_aux.percent[index_acordo_aux]);
-            //return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.cobertura, apolice_aux.dt_vencimento, qtde_seguradoras, addr_seguradora_aux, 0);
+            if (_index_seguradora >= apolice_aux.addr_seguradora.length) {
+                return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.cobertura, apolice_aux.dt_vencimento, qtde_seguradoras, 0, 0);
+            } else {
+                address addr_seguradora_aux = apolice_aux.addr_seguradora[_index_seguradora];
+                Acordo memory acordo_aux = acordos[addr_seguradora_aux];
+                uint index_acordo_aux =  apolice_aux.index_acordo[_index_seguradora];
+                return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.cobertura, apolice_aux.dt_vencimento, qtde_seguradoras, addr_seguradora_aux, acordo_aux.percent[index_acordo_aux]);
+            }
         }
     }
 
@@ -173,11 +162,30 @@ contract Cosseguro
     }
 
 	function contar_seguradoras(uint _index_apolice) constant returns (uint) {
-        return (apolices[_index_apolice].addr_seguradora.length);
+        if (apolices[_index_apolice].owner != msg.sender) {
+            return (0);
+        } else {
+            return (apolices[_index_apolice].addr_seguradora.length);
+        }
+    }
+
+	function contar_index_acordo(uint _index_apolice) constant returns (uint) {
+        if (apolices[_index_apolice].owner != msg.sender) {
+            return (0);
+        } else {
+            return (apolices[_index_apolice].index_acordo.length);
+        }
     }
 
     //apagar para a versão final do contrato
-    function consultar_apolice_aux(uint _index_apolice) constant returns (string, uint64, uint64, uint, uint, address, uint) {
+    function apagar_consultar_index_acordo(uint _index_apolice, uint _index_acordo) constant returns (uint) {
+        Apolice memory apolice_aux = apolices[_index_apolice];
+
+        return (apolice_aux.index_acordo[_index_acordo]);
+    }
+
+    //apagar para a versão final do contrato
+    function apagar_consultar_apolice_aux(uint _index_apolice) constant returns (string, uint64, uint64, uint, uint, address, uint) {
         Apolice memory apolice_aux = apolices[_index_apolice];
         /*
         string codigo;
@@ -302,8 +310,27 @@ contract Cosseguro
         return (acordos[msg.sender].index_apolice[_index_acordo], acordos[msg.sender].percent[_index_acordo], acordos[msg.sender].autorizado[_index_acordo]);
     }
 
+    function consultar_acordo_aceito(uint _index_apolice, address _adress_aux, uint _index_acordo) constant returns (uint64, bool) {
+        if (apolices[_index_apolice].owner != msg.sender) {
+            return (0, false);
+        } else {
+            bool addr_encontrado = false;
+
+            for (var i = 0; i < apolices[_index_apolice].addr_seguradora.length; i++) {
+                if (apolices[_index_apolice].addr_seguradora[i] == _adress_aux)
+                    addr_encontrado = true;
+            }
+
+            if (!addr_encontrado) {
+                return (0, false);
+            } else {
+                return (acordos[msg.sender].percent[_index_acordo], acordos[msg.sender].autorizado[_index_acordo]);
+            }
+        }
+    }
+
     // apagar essa função para o contrato na versão final
-    function consultar_acordo_aux(address _adress_aux, uint _index_acordo) constant returns (uint, uint64, bool) {
+    function apagar_consultar_acordo_aux(address _adress_aux, uint _index_acordo) constant returns (uint, uint64, bool) {
         return (acordos[_adress_aux].index_apolice[_index_acordo], acordos[msg.sender].percent[_index_acordo], acordos[msg.sender].autorizado[_index_acordo]);
     }
     ///////////////////////////////////////////////////
