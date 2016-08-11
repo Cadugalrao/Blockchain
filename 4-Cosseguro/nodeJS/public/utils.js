@@ -2,10 +2,9 @@
 var em_espera_execucao = function() {};
 var arrTransacoes = []; //guarda o transactionHash
 var arrEventosRecebidos_funcao = []; //guarda os eventos recebidos
-var arrEventosRecebidos_eh_erro = []; //guarda os eventos recebidos
+var arrEventosRecebidos_sucesso = []; //guarda os eventos recebidos
 var arrEventosRecebidos_tx = []; //guarda os eventos recebidos
-var arrEventosRecebidos_obj_ok = []; //guarda os eventos recebidos
-var arrEventosRecebidos_obj_erro = []; //guarda os eventos recebidos
+var arrEventosRecebidos_codRetorno = []; //guarda os eventos recebidos
 var arrEventosRecebidos_obj_tipo = []; //guarda os eventos recebidos
 var exibicao_em_andamento = false;
 var arrEventosRecebidos_l = 0;
@@ -14,8 +13,7 @@ var blockchain;
 var codigo_informado = false;
 var cosseguroABI_o;
 var cosseguro;
-var chave_apolice_verificada = true;
-var pesquisa_situacao_value = 9;
+var codigo_apolice_verificada = true;
 //fim variaveis globais
 
 //inicio controle de callback
@@ -196,25 +194,21 @@ function tx_pendente_atualizar_link() {
 function atualizar_exibicao_lista_tx() {
 	/**** atualização da lista de transações pendentes *******/
 	var controle_html = "";
-	var situacao = "";
+	var situacao_exibicao;
 	for (var t = 0; t < arrTransacoes.length; t++) {
 		arr_aux = arrTransacoes[t].split("|");
 
 		if (arr_aux[1] == "false") {
-			//situacao = '<img src="js_aux/load1.gif" width="20" />';
-			situacao = '<span style="font-size:2.5em;">&#9898;<span>';
-
+			situacao_exibicao = '<span style="font-size:2.5em;">&#9898;<span>';
 		} else {
 			if (arr_aux[3] == "true") {
-				//situacao = '<img src="js_aux/images/green.png" width="20" />';
-				situacao = '<span style="color:green; font-size:2.5em;">&#9899;<span>';
+				situacao_exibicao = '<span style="color:green; font-size:2.5em;">&#9899;<span>';
 			} else {
-				//situacao = '<img src="js_aux/images/red.png" width="20" />';
-				situacao = '<span style="color:red; font-size:2.5em;">&#9899;<span>';
+				situacao_exibicao = '<span style="color:red; font-size:2.5em;">&#9899;<span>';
 			}
 		}
 
-		controle_html = controle_html + '<div href="#" id="tx_pendente" index_tx="' + t + '" hash_tx="' + arr_aux[0] + '" class="ui-btn ui-corner-all ui-shadow ui-mini" style="width:85%; height:40px; margin:10px auto;"><div style="display:table; width:100%"><div style="display:table-cell; position:relative; width:85%; height:40px; vertical-align:middle;"><div style="width:100%; text-align:left; word-wrap:break-word; white-space:normal;">' + arr_aux[2] +'</div><div style="width:100%; text-align:left; word-wrap:break-word; white-space:normal; font-size:0.7em;">' + arr_aux[5] + '</div></div><div style="display:table-cell; position:relative; width:15%; height:40px; top:0px; text-align:center; vertical-align: middle;">' + situacao + '</div></div></div></div>';
+		controle_html = controle_html + '<div href="#" id="tx_pendente" index_tx="' + t + '" hash_tx="' + arr_aux[0] + '" class="ui-btn ui-corner-all ui-shadow ui-mini" style="width:85%; height:40px; margin:10px auto;"><div style="display:table; width:100%"><div style="display:table-cell; position:relative; width:85%; height:40px; vertical-align:middle;"><div style="width:100%; text-align:left; word-wrap:break-word; white-space:normal;">' + arr_aux[2] +'</div><div style="width:100%; text-align:left; word-wrap:break-word; white-space:normal; font-size:0.7em;">' + arr_aux[5] + '</div></div><div style="display:table-cell; position:relative; width:15%; height:40px; top:0px; text-align:center; vertical-align: middle;"> + situacao + </div></div></div></div>';
 	}
 	if (controle_html.length == 0) {
 		controle_html = "<p>N&atilde;o foram enviadas transa&ccedil;&otilde;es para minera&ccedil;&atilde;o</p>"
@@ -270,12 +264,10 @@ function exibir_mensagem(tipo) {
 
 		funcao = arrEventosRecebidos_funcao[aux_id];
 		tx = arrEventosRecebidos_tx[aux_id];
-		eh_erro = arrEventosRecebidos_eh_erro[aux_id];
-		obj_ok = arrEventosRecebidos_obj_ok[aux_id];
-		obj_erro = arrEventosRecebidos_obj_erro[aux_id];
-		obj_erro = arrEventosRecebidos_obj_tipo[aux_id];
+		sucesso = arrEventosRecebidos_sucesso[aux_id];
+		codRetorno = arrEventosRecebidos_codRetorno[aux_id];
 		var mensagem;
-		if (!eh_erro) {
+		if (sucesso) {
 			mensagem = "";
 			mensagem = mensagem + funcao + ": Minerada com sucesso.";
 
@@ -293,9 +285,7 @@ function exibir_mensagem(tipo) {
 			mensagem = "";
 			mensagem = mensagem + funcao + ": Ocorreu um erro na minera&ccedil;&atilde;o.";
 
-			cod_erro = obj_ok.args.cod_erro.toString();
-
-			mensagem = mensagem + "<br> &nbsp;&nbsp; Mensagem: " + tratamento_mensagem_erro(cod_erro);
+			mensagem = mensagem + "<br> &nbsp;&nbsp; Mensagem: " + tratamento_mensagem_erro(codRetorno);
 
 			$(".mensagem_erro").html(mensagem);
 
@@ -310,12 +300,11 @@ function exibir_mensagem(tipo) {
 	}
 }
 
-function registrarEvento(funcao, tx, eh_erro, obj_ok, obj_erro, tipo, codigo) {
+function registrarEvento(funcao, tx, sucesso, tipo, codRetorno) {
 	arrEventosRecebidos_funcao[arrEventosRecebidos_l] = funcao;
 	arrEventosRecebidos_tx[arrEventosRecebidos_l] = tx;
-	arrEventosRecebidos_eh_erro[arrEventosRecebidos_l] = eh_erro;
-	arrEventosRecebidos_obj_ok[arrEventosRecebidos_l] = obj_ok;
-	arrEventosRecebidos_obj_erro[arrEventosRecebidos_l] = obj_erro;
+	arrEventosRecebidos_sucesso[arrEventosRecebidos_l] = sucesso;
+	arrEventosRecebidos_codRetorno[arrEventosRecebidos_l] = codRetorno;
 	arrEventosRecebidos_obj_tipo[arrEventosRecebidos_l] = tipo;
 	arrEventosRecebidos_l++;
 
@@ -324,11 +313,11 @@ function registrarEvento(funcao, tx, eh_erro, obj_ok, obj_erro, tipo, codigo) {
 
 		mensagem_resposta = funcao + ": Minerada com sucesso.";
 
-		if (eh_erro) {
+		if (!sucesso) {
 			mensagem_resposta = funcao + ": Ocorreu um erro na minera&ccedil;&atilde;o.";
-			mensagem_resposta = mensagem_resposta + "<br> &nbsp;&nbsp; Mensagem: " + tratamento_mensagem_erro(codigo);
+			mensagem_resposta = mensagem_resposta + "<br> &nbsp;&nbsp; Mensagem: " + tratamento_mensagem_erro(codRetorno);
 		}
-		tx_marcar_resposta(tx, !eh_erro, mensagem_resposta);
+		tx_marcar_resposta(tx, sucesso, mensagem_resposta);
 	}
 }
 //fim controle de callback
@@ -387,7 +376,7 @@ function listar_sobra_falta(query_filtro, s_ou_f, limite_sobra, limite_falta) {
 	if (s_ou_f == "falta") {
 		if (html_falta != "") {
 			html_geral += "<br /><table class=\"falta\">";
-			html_geral += "<th>Codigo Opera&ccedil;&atilde;o</th><th>Valor Atualizado da Opera&ccedil;&atilde;o (R$)</th><th>Valor Alocado (R$)</th>";
+			html_geral += "<th>Código Opera&ccedil;&atilde;o</th><th>Valor Atualizado da Opera&ccedil;&atilde;o (R$)</th><th>Valor Alocado (R$)</th>";
 			html_geral += html_falta;
 			html_geral += "</table>";
 		} else {
@@ -402,43 +391,19 @@ function listar_sobra_falta(query_filtro, s_ou_f, limite_sobra, limite_falta) {
 
 //inicio acordo
 function inicializar_autocomplete_acordo() {
-	var operacoes = [];
+	var acordos = [];
 
-	for (o = 0; o < blockchain.operacoes.length; o++){
-		operacoes.push({
+	for (o = 0; o < blockchain.acordos.length; o++){
+		acordos.push({
 			index: o,
-			value: blockchain.operacoes[o].codigo_op,
-			label: blockchain.operacoes[o].codigo_op,
-			desc: "R$ " + formata_valor_descida(blockchain.operacoes[o].valor_atualizado)
+			value: blockchain.acordos[o].codigo_apolice,
+			label: blockchain.acordos[o].codigo_apolice,
+			desc: "R$ " + formata_valor_descida(blockchain.acordos[o].valor_atualizado)
 		});
 	}
-
-	$( "#codigo_op" ).autocomplete({
-		minLength: 3,
-		source: operacoes,
-		focus: function( event, ui ) {
-			$( "#codigo_op" ).val( ui.item.label );
-			$("#codigo_op").blur();
-			incluir_apolice_lista_apolices(ui.item.label)
-			return false;
-		},
-		select: function( event, ui ) {
-			//$( "#codigo_op" ).val( ui.item.label );
-			//$( "#codigo_op-id" ).val( ui.item.value );
-
-			return false;
-		}
-	}).autocomplete( "instance" )._renderItem = function( ul, item ) {
-		return $( "<li>" )
-		//.append( "<a>" + item.label + "<br>" + item.desc + "</a>" )
-		//.append( '<span style="display:table; width:100%"><span style="display:table-cell; position:relative; width:55%; vertical-align:middle; text-align:left; word-wrap:break-word; white-space:normal; font-size:0.8em;">' + item.label + '</span><span style="display:table-cell; position:relative; width:45%; text-align:center; vertical-align: middle; font-size:0.8em;">' + item.desc + '</span></span>' )
-		.append( '<span style="text-align:left; word-wrap:break-word; white-space:normal; font-size:0.8em;">' + item.label + '</span><br /><span style="font-size:0.8em;">' + item.desc + '</span>' )
-
-		.appendTo( ul );
-	};
 }
 
-function listarOperacoes(quantidade, query_filtro) {
+function listarAcordos(quantidade, query_filtro) {
 	// se "quantidade" == 0 mostra todos
 	// se "quantidade" != 0 mostra os últimos conforme valor informado
 
@@ -450,14 +415,14 @@ function listarOperacoes(quantidade, query_filtro) {
 	}
 
 	var total_loops; // = 15;
-	total_loops = blockchain.operacoes.length;
+	total_loops = blockchain.Acordos.length;
 
-	operacoes_html = "<b class=\"title\">Listagem de Operações</b>";
-	//operacoes_html = operacoes_html + "colocar filtro<br>";
-	//operacoes_html = operacoes_html + "diminuir a letra na tabela";
-	operacoes_html = operacoes_html + "<table>";
-	operacoes_html = operacoes_html + "<tr><td>C&oacute;digo</td><td><input id=\"codigo_acordo_pesquisa\" size=\"20\" value=\"" + query_filtro + "\" /></td><td><img class=\"icon_aux\" src=\"js_aux/images/lupa.png\" alt=\"\" id=\"btn-pesquisar-acordo\" width=\"20\" height=\"20\" style=\"cursor: hand;\" /></td></tr>";
-	operacoes_html = operacoes_html + "</table>";
+	acordos_html = "<b class=\"title\">Listagem de Operações</b>";
+	//acordos_html = acordos_html + "colocar filtro<br>";
+	//acordos_html = acordos_html + "diminuir a letra na tabela";
+	acordos_html = acordos_html + "<table>";
+	acordos_html = acordos_html + "<tr><td>C&oacute;digo</td><td><input id=\"codigo_acordo_pesquisa\" size=\"20\" value=\"" + query_filtro + "\" /></td><td><img class=\"icon_aux\" src=\"public/images/lupa.png\" alt=\"\" id=\"btn-pesquisar-acordo\" width=\"20\" height=\"20\" style=\"cursor: hand;\" /></td></tr>";
+	acordos_html = acordos_html + "</table>";
 
 	if (total_loops < 10) {
 		total_limite = 0;
@@ -466,12 +431,12 @@ function listarOperacoes(quantidade, query_filtro) {
 	}
 
 	var valor_aux;
-	var operacoes_html_conteudo = ""
+	var acordos_html_conteudo = ""
 	for (var i=total_loops; i > 0; i--) {
-		var codigo_aux = blockchain.operacoes[i - 1].codigo_op;
+		var codigo_apolice_aux = blockchain.acordos[i - 1].codigo_apolice;
 
 		if (pesquisa_ativada) {
-			if (codigo_aux.toLowerCase().indexOf(query_filtro.toLowerCase()) >= 0) {
+			if (codigo_apolice_aux.toLowerCase().indexOf(query_filtro.toLowerCase()) >= 0) {
 				exibir = true;
 			} else {
 				exibir = false;
@@ -481,25 +446,24 @@ function listarOperacoes(quantidade, query_filtro) {
 		}
 
 		if (exibir) {
-			//operacoes_html = operacoes_html + ">> " + i + " - codigo: " + codigo_aux + " > valor: " + arr[1] + " > ativo: " + arr[2] + "<br>";
-			valor_atualizado_aux = formata_valor_descida(blockchain.operacoes[i - 1].valor_atualizado, false);
+			valor_atualizado_aux = formata_valor_descida(blockchain.acordos[i - 1].valor_atualizado, false);
 
 			index_acordo = i - 1;
-			operacoes_html_conteudo = operacoes_html_conteudo + '<div href="#" id="btn-alterar-acordo" index="' + index_acordo + '" class="ui-btn ui-corner-all ui-icon-carat-r ui-btn-icon-right ui-shadow ui-mini" style="width:85%; margin:10px auto;"><div style="display:inline-block; width:55%; text-align:left;">' + codigo_aux +'</div><div style="display:inline-block; width:5%; text-align:left;">R$</div><div style="display:inline-block; width:39%; padding-right:30px; text-align:right;">' + valor_atualizado_aux + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div></div>';
+			acordos_html_conteudo = acordos_html_conteudo + '<div href="#" id="btn-alterar-acordo" index="' + index_acordo + '" class="ui-btn ui-corner-all ui-icon-carat-r ui-btn-icon-right ui-shadow ui-mini" style="width:85%; margin:10px auto;"><div style="display:inline-block; width:55%; text-align:left;">' + codigo_apolice_aux +'</div><div style="display:inline-block; width:5%; text-align:left;">R$</div><div style="display:inline-block; width:39%; padding-right:30px; text-align:right;">' + valor_atualizado_aux + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div></div>';
 		}
 
 	}
 
 
-	if (operacoes_html_conteudo != "") {
-		operacoes_html = operacoes_html + operacoes_html_conteudo;
+	if (acordos_html_conteudo != "") {
+		acordos_html = acordos_html + acordos_html_conteudo;
 	} else if (pesquisa_ativada) {
-		operacoes_html = operacoes_html + "<br /><table class=\"lista\"><tr><td style=\"border: none;\">N&atilde;o foram encontradas opera&ccedil;&otilde;es com o c&oacute;digo informado: \"" + query_filtro + "\"</td></tr></table>";
+		acordos_html = acordos_html + "<br /><table class=\"lista\"><tr><td style=\"border: none;\">N&atilde;o foram encontradas opera&ccedil;&otilde;es com o c&oacute;digo informado: \"" + query_filtro + "\"</td></tr></table>";
 	} else {
-		operacoes_html = operacoes_html + "<br /><table class=\"lista\"><tr><td style=\"border: none;\">N&atilde;o h&aacute; opera&ccedil;&otilde;es cadastradas.</td></tr></table>";
+		acordos_html = acordos_html + "<br /><table class=\"lista\"><tr><td style=\"border: none;\">N&atilde;o h&aacute; opera&ccedil;&otilde;es cadastradas.</td></tr></table>";
 	}
 
-	return operacoes_html.replace(/[^\x20-\x7E]+/g, '');
+	return acordos_html.replace(/[^\x20-\x7E]+/g, '');
 }
 
 function atualizar_links_acordo_pesq(titulo) {
@@ -507,7 +471,7 @@ function atualizar_links_acordo_pesq(titulo) {
 		query = $("#codigo_acordo_pesquisa").val().toString().trim();
 
 		if (query.length >= 3) {
-			html_lista_acordo = listarOperacoes(0, query);
+			html_lista_acordo = listarAcordos(0, query);
 			$("#consultar_acordo").html(html_lista_acordo);
 
 			atualizar_links_acordo();
@@ -524,12 +488,12 @@ function atualizar_links_acordo() {
 		$(this).click(function() {
 			index_acordo = $(this).attr('index');
 
-			var codigo_aux = blockchain.operacoes[index_acordo].codigo_op;
-			valor_aux = formata_valor_descida(blockchain.operacoes[index_acordo].valor, false) ;// + ",00");
-			valor_atualizado_aux = formata_valor_descida(blockchain.operacoes[index_acordo].valor_atualizado, true) ;// + ",00");
+			//var codigo_acordo_aux = blockchain.acordos[index_acordo].codigo_acordo;
+			valor_aux = formata_valor_descida(blockchain.acordos[index_acordo].valor, false) ;// + ",00");
+			valor_atualizado_aux = formata_valor_descida(blockchain.acordos[index_acordo].valor_atualizado, true) ;// + ",00");
 
 			$("input#valor_atualizado_acordo_alt").val(valor_atualizado_aux);
-			$("span#codigo_acordo_alt").html(codigo_aux);
+			//$("span#codigo_acordo_alt").html(codigo_acordo_aux);
 			$("span#valor_acordo_alt").html(valor_aux);
 
 			$("#controle_lista_eventos").hide();
@@ -542,33 +506,26 @@ function atualizar_links_acordo() {
 			$("#incluir_apolice").hide();
 			$("#alterar_apolice").hide();
 			$("#consultar_apolice").hide();
+			$("#detalhar_apolice").hide();
 		});
 	});
 }
-// fim operacoes
+// fim acordos
 
 // inicio apolices
-function incluir_apolice_lista_apolices(codigo_op) {
-	var html_aux = listarapolices(0, codigo_op, "", 9);
-	$("#incluir_apolice_lista_apolices").html(html_aux);
+/*
+function incluir_apolice_lista_apolices(codigo_apolice) {
+	var html_aux = listarapolices(0, codigo_apolice);
+	//$("#inncluir_apolice_lista_apolices").html(html_aux);
 }
+*/
 
-function listarapolices(quantidade, query_acordo, query_apolice, query_situacao) {
+function listarapolices(quantidade, query_apolice) {
 	// se "quantidade" == 0 mostra todos
 	// se "quantidade" != 0 mostra os últimos conforme valor informado
 
 	atualiza_cache_blockchain();
 	
-	pesquisa_situacao_value = query_situacao;
-	
-	var situacao_aux = "";
-	var pesquisa_ativada_op = false;
-	if (query_acordo.trim().length >= 3) {
-		pesquisa_ativada_op = true;
-	} else {
-		query_acordo = "";
-	}
-
 	var pesquisa_ativada_apolice = false;
 	if (query_apolice.trim().length >= 3) {
 		pesquisa_ativada_apolice = true;
@@ -576,16 +533,9 @@ function listarapolices(quantidade, query_acordo, query_apolice, query_situacao)
 		query_apolice = "";
 	}
 	
-	var pesquisa_ativada_apolice_situacao = false;
-	if (query_situacao >= 0 && query_situacao <= 4) {
-		pesquisa_ativada_apolice_situacao = true;
-	} else {
-		query_situacao = 9;
-	}
-
-	var total_loops_op; // = 15;
+	var total_loops_acordo; // = 15;
 	var total_loops_apolice; // = 15;
-	total_loops_op = 0; //blockchain.operacoes.length;
+	total_loops_apolice = blockchain.apolices.length;
 
 	var apolices_html_conteudo = "";
 	var apolices_html = "";
@@ -593,20 +543,21 @@ function listarapolices(quantidade, query_acordo, query_apolice, query_situacao)
 	//apolices_html = apolices_html + "colocar filtro<br>";
 	//apolices_html = apolices_html + "diminuir a letra na tabela";
 
-	if (!pesquisa_ativada_op) {
+	//if (!pesquisa_ativada_apolice) {
 		apolices_html = apolices_html + "<table>";
-		apolices_html = apolices_html + "<tr><td>Chave</td><td><input id=\"codigo_apolice_pesquisa\" value=\"" + query_apolice + "\" size=\"20\" /></td><td><img class=\"icon_aux\" src=\"js_aux/images/lupa.png\" alt=\"\" id=\"btn-pesquisar-apolices\" width=\"20\" height=\"20\" /></td></tr>";
-		apolices_html = apolices_html + "<tr><td>Situacao</td><td><select id=\"situacao_apolice_select_pesq\"></select></td><td>&nbsp;</td></tr>";
+		apolices_html = apolices_html + "<tr><td>Código</td><td><input id=\"codigo_apolice_pesquisa\" value=\"" + query_apolice + "\" size=\"20\" /></td><td><img class=\"icon_aux\" src=\"public/images/lupa.png\" alt=\"\" id=\"btn-pesquisar-apolices\" width=\"20\" height=\"20\" /></td></tr>";
 		apolices_html = apolices_html + "</table>";
-	}
+	//}
 
-	var exibir_chave = false;
-	var exibir_situacao = false;
-	for (var o=total_loops_op; o > 0; o--)
+	for (var iApolices=total_loops_apolice; iApolices > 0; iApolices--)
 	{
-		codigo_op_aux = blockchain.operacoes[o-1].codigo_op
-		if (pesquisa_ativada_op) {
-			if (codigo_op_aux.toLowerCase().indexOf(query_acordo.toLowerCase()) >= 0) {
+		codigo_apolice = blockchain.apolices[iApolices-1].codigo_apolice;
+		valor_premio = blockchain.apolices[iApolices-1].valor_premio;
+		valor_cobertura = blockchain.apolices[iApolices-1].valor_cobertura;
+		dt_vencimento = blockchain.apolices[iApolices-1].dt_vencimento;
+
+		if (pesquisa_ativada_apolice) {
+			if (codigo_apolice.toLowerCase().indexOf(query_apolice.toLowerCase()) >= 0) {
 				exibir = true;
 			} else {
 				exibir = false;
@@ -616,65 +567,17 @@ function listarapolices(quantidade, query_acordo, query_apolice, query_situacao)
 		}
 
 		if (exibir) {
+			//total_loops_acordo = blockchain.apolices[iApolices-1].acordos.length;
 
-			total_loops_apolice = blockchain.operacoes[o-1].apolices.length;
-
-			for (var d=total_loops_apolice; d > 0; d--)
-			{
-				chave_apolice = blockchain.operacoes[o-1].apolices[d-1].chave
-				if (pesquisa_ativada_apolice) {
-					if (chave_apolice.toLowerCase().indexOf(query_apolice.toLowerCase()) >= 0) {
-						exibir_chave = true;
-					} else {
-						exibir_chave = false;
-					}
-				} else {
-					exibir_chave = true;
-				}
+			//for (var iAcordos=total_loops_acordo; iAcordos > 0; iAcordos--) {
+				//addr_seguradora = blockchain.apolices[iApolices-1].acordos[iAcordos-1].addr_seguradora; 
+				//percent = blockchain.apolices[iApolices-1].acordos[iAcordos-1].percent; 
+				//autorizado = blockchain.apolices[iApolices-1].acordos[iAcordos-1].autorizado; 
 				
-				
-				situacao_aux = (blockchain.operacoes[o-1].apolices[d-1].situacao);
-				if (pesquisa_ativada_apolice_situacao) {
-					if (situacao_aux == query_situacao) {
-						exibir_situacao = true;
-					} else {
-						exibir_situacao = false;
-					}
-				} else {
-					exibir_situacao = true;
-				}
-				
-				
-				if (exibir_chave && exibir_situacao) {
-					valor_aux = formata_valor_descida(blockchain.operacoes[o-1].apolices[d-1].valor, false);// / 100;
-					if (situacao_aux == 0) { //branco ou cinza
-						situacao_aux = '<span style="color: grey;">';
-						situacao_aux += situacao_descricao(blockchain.operacoes[o-1].apolices[d-1].situacao)
-						situacao_aux += '</span>';
-					} else if (situacao_aux == 1) { //verde
-						situacao_aux = '<span style="color: green;">';
-						situacao_aux += situacao_descricao(blockchain.operacoes[o-1].apolices[d-1].situacao)
-						situacao_aux += '</span>';
-					} else if (situacao_aux == 2) { //azul
-						situacao_aux = '<span style="color: blue;">';
-						situacao_aux += situacao_descricao(blockchain.operacoes[o-1].apolices[d-1].situacao)
-						situacao_aux += '</span>';
-					} else if (situacao_aux == 3) { //vermelho
-						situacao_aux = '<span style="color: red;">';
-						situacao_aux += situacao_descricao(blockchain.operacoes[o-1].apolices[d-1].situacao)
-						situacao_aux += '</span>';
-					} else if (situacao_aux == 4) { //laranja
-						situacao_aux = '<span style="color: orange;">';
-						situacao_aux += situacao_descricao(blockchain.operacoes[o-1].apolices[d-1].situacao)
-						situacao_aux += '</span>';
-					}
-					
-					//valor_aux = valor_aux.format(2, 3, '.', ',');
-					index_apolice = d - 1;
-					index_acordo = o - 1;
-					apolices_html_conteudo = apolices_html_conteudo + '<div href="#" id="btn-alterar-apolice" index_apolice="' + index_apolice + '" index_acordo="' + index_acordo + '" desc_acordo="' + codigo_op_aux + '" class="ui-btn ui-corner-all ui-icon-carat-r ui-btn-icon-right ui-shadow ui-mini" style="width:85%; margin:10px auto; text-align:left;"><table style="margin:0px; width:90%;"><tr><td colspan="2"><div style="width:100%; text-align:left; font-size:0.7em">' + chave_apolice +'</div></td></tr><tr><td><div style="width:100%; text-align:left; font-size:0.8em;" id="situacao_apolice_lista_' + index_acordo + '_' + index_apolice + '">' + situacao_aux + '</div></td><td><div style="width:100%; text-align:right; font-size:0.8em;">R$ ' + valor_aux + '</div></td></tr></table></div>';
-				}
-			}
+				index_apolice = iApolices - 1;
+				//index_acordo = iAcordos - 1;
+				apolices_html_conteudo = apolices_html_conteudo + '<div href="#" id="btn-detalhar-apolice" index_apolice="' + index_apolice + '" index_acordo=" + index_acordo + " desc_acordo="' + codigo_apolice + '" class="ui-btn ui-corner-all ui-icon-carat-r ui-btn-icon-right ui-shadow ui-mini" style="width:85%; margin:10px auto; text-align:left;"><table style="margin:0px; width:90%;"><tr><td colspan="2"><div style="width:100%; text-align:left; font-size:0.7em">' + codigo_apolice +'</div></td></tr><tr><td><div style="width:100%; text-align:left; font-size:0.8em;" id="situacao_apolice_lista_' + index_apolice + '_ + index_acordo + ">Cobertura: R$' + formata_valor_descida(valor_cobertura, false) + '</div></td><td><div style="width:100%; text-align:right; font-size:0.8em;">Data Venc.: ' + dt_vencimento + '</div></td></tr></table></div>';
+			//}
 		}
 	}
 
@@ -684,30 +587,12 @@ function listarapolices(quantidade, query_acordo, query_apolice, query_situacao)
 		apolices_html = apolices_html + apolices_html_conteudo;
 		//apolices_html = apolices_html + "</table>";
 	} else if (pesquisa_ativada_apolice) {
-		apolices_html = apolices_html + "<br /><table class=\"lista\"><tr><td style=\"border: none;\">N&atilde;o foram encontradas apolices com a chave informada: \"" + query_apolice + "\"</td></tr></table>";
-	} else if (pesquisa_ativada_op) {
-		apolices_html = apolices_html + "<br /><br /><table class=\"lista\"><tr><td style=\"border: none;\">N&atilde;o foram encontradas apolices para essa operac&atilde;o</td></tr></table>";
+		apolices_html = apolices_html + "<br /><table class=\"lista\"><tr><td style=\"border: none;\">N&atilde;o foram encontradas apolices com o código informado: \"" + query_apolice + "\"</td></tr></table>";
 	} else {
-		apolices_html = apolices_html + "<br /><table class=\"lista\"><tr><td style=\"border: none;\">N&atilde;o h&aacute; apolices cadastrados.</td></tr></table>";
+		apolices_html = apolices_html + "<br /><table class=\"lista\"><tr><td style=\"border: none;\">N&atilde;o h&aacute; apolices cadastradas.</td></tr></table>";
 	}
 
 	return apolices_html.replace(/[^\x20-\x7E]+/g, '');
-}
-
-function situacao_descricao(situacao_aux) {
-	situacao_aux = parseInt(situacao_aux);
-	
-	if (situacao_aux == 0) {
-		return "Liberada";
-	} else if (situacao_aux == 1) {
-		return "Confirmada";
-	} else if (situacao_aux == 2) {
-		return "Executada";
-	} else if (situacao_aux == 3) {
-		return "Cancelada";
-	} else if (situacao_aux == 4) {
-		return "Em an&aacute;lise";
-	}
 }
 
 function sub_menu_apolice_alterar_limpar() {
@@ -716,16 +601,14 @@ function sub_menu_apolice_alterar_limpar() {
 	$("#cpf_cnpj_sacado_alt").val("");
 	$("#cpf_cnpj_sacado_alt").css('border', 'none');
 	$("#valor_apolice_alt").val("");
-	$('#situacao_apolice_select_alt').find('option').remove();
-	$("#situacao_apolice_select_alt").selectmenu("refresh");
 }
 
 function atualizar_links_apolice_pesq() {
 	$("#btn-pesquisar-apolices").click(function() {
-		query = $("#codigo_apolice_pesquisa").val().toString().trim();
+		query_codigo_apolice = $("#codigo_apolice_pesquisa").val().toString().trim();
 
-		/*if (query.length >= 3) {*/
-			html_lista_apolices = listarapolices(0, "", query, $("#situacao_apolice_select_pesq").val());
+		/*if (query_codigo_apolice.length >= 3) {*/
+			html_lista_apolices = listarapolices(0, query_codigo_apolice);
 			$("#consultar_apolice").html(html_lista_apolices);
 
 			atualizar_links_apolice();
@@ -738,83 +621,113 @@ function atualizar_links_apolice_pesq() {
 }
 
 function sub_menu_apolice_incluir_limpar() {
-	$("#codigo_op").val("");
-	$("#chave_apolice").val("");
-	$("#chave_apolice").css('border', 'none');
-	$("#cnpj_emissor").val("");
-	$("#cnpj_emissor").css('border', 'none');
-	$("#cpf_cnpj_sacado").val("");
-	$("#cpf_cnpj_sacado").css('border', 'none');
-	$("#valor_apolice").val("");
-	//$("#situacao_nova_apolice")[0].selectedIndex = '0';
-	//$("#situacao_nova_apolice").selectmenu("refresh");
-	$("input[type='checkbox']").attr("checked",false).checkboxradio("refresh");
-	
-	$("#dados_apolice").collapsible( "collapse" );
-	
-	$( "#dados_apolice" ).collapsible( "option", "disabled", true );
-	$( "#incluir_apolice_btn" ).attr('disabled','disabled');
-	
-	$("#incluir_apolice_lista_apolices").html("");
+	$("#cad_apolice_codigo").val("");
+	$("#cad_apolice_codigo").css('border', 'none');
+	$("#cad_apolice_valor_premio").val("");
+	$("#cad_apolice_valor_premio").css('border', 'none');
+	$("#cad_apolice_valor_cobertura").val("");
+	$("#cad_apolice_valor_cobertura").css('border', 'none');
+	$("#cad_apolice_dt_vencimento").date({
+		setDate: null, 
+		altFormat: "dd/mm/yy",
+		minDate: new Date()
+	});
+	$("#cad_apolice_dt_vencimento").css('border', 'none');
+
+	$( "#cad_apolice_dt_vencimento" ).date("refresh");
 }
 
 function atualizar_links_apolice() {
 	
-	$("#situacao_apolice_select_pesq").selectmenu();
+	$("#codigo_apolice_pesquisa").textinput();
 	
-	$('#situacao_apolice_select_pesq').append($('<option>', {value: 9, text : 'Todas'}));
-	$('#situacao_apolice_select_pesq').append($('<option>', {value: 0, text : 'Liberada'}));
-	$('#situacao_apolice_select_pesq').append($('<option>', {value: 1, text : 'Confirmada'}));
-	$('#situacao_apolice_select_pesq').append($('<option>', {value: 2, text : 'Executada'}));
-	$('#situacao_apolice_select_pesq').append($('<option>', {value: 3, text : 'Cancelada'}));
-	$('#situacao_apolice_select_pesq').append($('<option>', {value: 4, text : 'Em análise'}));
-	
-	pesquisa_situacao_value = parseInt(pesquisa_situacao_value);
-	
-	if (pesquisa_situacao_value == 9) {
-		$("#situacao_apolice_select_pesq")[0].selectedIndex = '0';
-	} else {
-		$("#situacao_apolice_select_pesq")[0].selectedIndex = (pesquisa_situacao_value + 1).toString();
-	}
-	
-	$('#situacao_apolice_select_pesq').selectmenu("refresh");
-	
-	$('#situacao_apolice_select_pesq').on('change', function (e) {
-		situacao_pesq = this.value;
+	$( "div#btn-detalhar-apolice" ).each(function(index) {
+		$(this).on( "swiperight", function() {
+				index_apolice = $(this).attr('index_apolice');
+
+				var codigo_apolice = blockchain.apolices[index_apolice].codigo_apolice;
+				var valor_premio = blockchain.apolices[index_apolice].valor_premio;
+				var valor_cobertura = blockchain.apolices[index_apolice].valor_cobertura;
+				var dt_vencimento = blockchain.apolices[index_apolice].dt_vencimento;
+				
+				var addr_seguradora = "";
+				var percent = "";
+				var autorizado = "";
+
+				var total_loops_acordo = blockchain.apolices[index_apolice].acordos.length;
+
+				for (var iAcordos=total_loops_acordo; iAcordos > 0; iAcordos--) {
+					addr_seguradora = blockchain.apolices[index_apolice].acordos[iAcordos-1].addr_seguradora;
+					percent = blockchain.apolices[index_apolice].acordos[iAcordos-1].percent;
+					autorizado = blockchain.apolices[index_apolice].acordos[iAcordos-1].autorizado;
+				}
+		});
 		
-		var chave_apolice = $("#codigo_apolice_pesquisa").val().toString().trim();
-		
-		html_lista_apolice = listarapolices(0, "", chave_apolice, situacao_pesq);
-		$("#consultar_apolice").html(html_lista_apolice);
-		atualizar_links_apolice();
-		atualizar_links_apolice_pesq();
-		
+		$(this).click(function() {
+
+			index_apolice = $(this).attr('index_apolice');
+			
+			var codigo_apolice = blockchain.apolices[index_apolice].codigo_apolice;
+			var valor_premio = blockchain.apolices[index_apolice].valor_premio;
+			var valor_cobertura = blockchain.apolices[index_apolice].valor_cobertura;
+			var dt_vencimento = blockchain.apolices[index_apolice].dt_vencimento;
+
+			$("#det_apolice_codigo").html(codigo_apolice);
+			$("#det_apolice_valor_premio").html("R$ " + formata_valor_descida(valor_premio, false));
+			$("#det_apolice_valor_cobertura").html("R$ " + formata_valor_descida(valor_cobertura));
+			$("#det_apolice_dt_vencimento").html(dt_vencimento);
+			
+			var addr_seguradora = "";
+			var percent = "";
+			var autorizado = "";
+
+			var total_loops_acordo = blockchain.apolices[index_apolice].acordos.length;
+
+			var acordo_html_conteudo = "";
+			for (var iAcordos=total_loops_acordo; iAcordos > 0; iAcordos--) {
+				addr_seguradora = blockchain.apolices[index_apolice].acordos[iAcordos-1].addr_seguradora;
+				percent = blockchain.apolices[index_apolice].acordos[iAcordos-1].percent;
+				autorizado = blockchain.apolices[index_apolice].acordos[iAcordos-1].autorizado;
+				if (autorizado) {
+					autorizado_situacao = "Autorizado"
+				} else {
+					autorizado_situacao = "Não autorizado"
+				}
+				acordo_html_conteudo = acordo_html_conteudo + '<div index_acordo="' + iAcordos + '" class="ui-btn ui-corner-all ui-icon-carat-r ui-shadow ui-mini" style="width:85%; margin:10px auto; text-align:left;"><table style="margin:0px; width:90%;"><tr><td colspan="2"><div style="width:100%; text-align:left; font-size:0.7em">' + addr_seguradora +'</div></td></tr><tr><td><div style="width:100%; text-align:left; font-size:0.8em;">Cossegurado com: ' + percent + '%</div></td><td><div style="width:100%; text-align:right; font-size:0.8em;">Situação: ' + autorizado_situacao + '</div></td></tr></table></div>';
+			}
+			
+			$("#detalhar_apolice__lista_acordos").html(acordo_html_conteudo);
+
+			$("#controle_lista_eventos").hide();
+			$("#sub-menu-grupo-acordo").hide();
+			$("#sub-menu-grupo-apolice").show();
+			$("#master-container").show();
+			$("#incluir_acordo").hide();
+			$("#alterar_acordo").hide();
+			$("#consultar_acordo").hide();
+			$("#incluir_apolice").hide();
+			$("#alterar_apolice").hide();
+			$("#consultar_apolice").hide();
+			$("#detalhar_apolice").show();
+
+		});
 	});
 	
-	$("#codigo_apolice_pesquisa").textinput();	
-	
-	$( "div#btn-alterar-apolice" ).each(function(index) {
+	/*
+	$( "div#btn-detalhar-apolice" ).each(function(index) {
 		$(this).on( "swiperight", function() {
 				index_apolice = $(this).attr('index_apolice');
 				index_acordo = $(this).attr('index_acordo');
 
-				chave_aux = blockchain.operacoes[index_acordo].apolices[index_apolice].chave;
-				var chave_apolice_big = new BigNumber(chave_aux, 10);
+				chave_aux = blockchain.acordos[index_acordo].apolices[index_apolice].chave;
+				var codigo_apolice_big = new BigNumber(chave_aux, 10);
 				
-				var dados_apolice = 0; //cosseguro.consultar_apolice(chave_apolice_big);
+				var dados_apolice = 0; //cosseguro.consultar_apolice(codigo_apolice_big);
 				var arr_aux_apolice = dados_apolice.toString().split(",");
-
-				var situacao = arr_aux_apolice[4].toString().replace(/[^\x20-\x7E]+/g, '').trim();
-				situacao = parseInt(situacao);
-				
-				if (situacao != 4 || $("#situacao_apolice_lista_" + index_acordo + "_" + index_apolice).html().toString().indexOf("em andamento") >=0) {
-					alert("Confirma&ccedil;&atilde;o n&atilde;o permitida para essa apolice");
-					return;
-				}
 				
 				/*
-				//cosseguro.alterar_situacao_apolice.sendTransaction(chave_apolice_big, 1, {
-				cosseguro.alterar_apolice.sendTransaction(chave_apolice_big, 0, 0, 0, 1, {
+				//cosseguro.alterar_situacao_apolice.sendTransaction(codigo_apolice_big, 1, {
+				cosseguro.alterar_apolice.sendTransaction(codigo_apolice_big, 0, 0, 0, 1, {
 					from: web3.eth.coinbase, gas: config[3].GAS }, function(err, txHash) {
 						if (err != null) {
 							//alert("Erro: " + err.message);
@@ -825,60 +738,28 @@ function atualizar_links_apolice() {
 						}
 					}
 				);
-				*/
+				
 		});
 		
 		$(this).click(function() {
 
-			$("#situacao_apolice_select_div_alt").hide();
-			$('#situacao_apolice_select_alt').find('option').remove();
-			
 			index_apolice = $(this).attr('index_apolice');
 			index_acordo = $(this).attr('index_acordo');
 
-			chave_aux = blockchain.operacoes[index_acordo].apolices[index_apolice].chave;
-			valor_aux = formata_valor_descida(blockchain.operacoes[index_acordo].apolices[index_apolice].valor, true);
-			dataCriacao_aux = blockchain.operacoes[index_acordo].apolices[index_apolice].dataCriacao;
-			cnpj_emissor_aux = blockchain.operacoes[index_acordo].apolices[index_apolice].cnpj_emissor;
-			cpf_cnpj_sacado_aux = blockchain.operacoes[index_acordo].apolices[index_apolice].cpf_cnpj_sacado;
-			situacao_aux = blockchain.operacoes[index_acordo].apolices[index_apolice].situacao;
+			chave_aux = blockchain.acordos[index_acordo].apolices[index_apolice].chave;
+			valor_aux = formata_valor_descida(blockchain.acordos[index_acordo].apolices[index_apolice].valor, true);
+			dataCriacao_aux = blockchain.acordos[index_acordo].apolices[index_apolice].dataCriacao;
+			cnpj_emissor_aux = blockchain.acordos[index_acordo].apolices[index_apolice].cnpj_emissor;
+			cpf_cnpj_sacado_aux = blockchain.acordos[index_acordo].apolices[index_apolice].cpf_cnpj_sacado;
 			
-			
-			$("#codigo_op_alt").html(blockchain.operacoes[index_acordo].codigo_op);
-			$("#chave_apolice_alt").html(chave_aux);
+			$("#codigo_apolice_alt").html(blockchain.acordos[index_acordo].codigo_apolice);
+			$("#codigo_apolice_alt").html(chave_aux);
 	
 			$("#cpf_cnpj_sacado_alt").val(cpf_cnpj_sacado_aux);
 			MascaraCPF_CNPJ($('#cpf_cnpj_sacado_alt'));
 			$("#cnpj_emissor_alt").val(cnpj_emissor_aux);
 			MascaraCPF_CNPJ($('#cnpj_emissor_alt'));
 			$("#valor_apolice_alt").val(valor_aux);
-			$("#situacao_apolice_text_alt").html(situacao_descricao(situacao_aux));
-			
-			if (situacao_aux == 1) {
-				//return "Alocada";
-				$("#situacao_apolice_select_div_alt").show();
-				
-				$('#situacao_apolice_select_alt').append($('<option>', {value: 1, text : 'Manter situação atual'}));
-				$('#situacao_apolice_select_alt').append($('<option>', {value: 0, text : 'Liberada'}));
-				$('#situacao_apolice_select_alt').append($('<option>', {value: 2, text : 'Executada'}));
-				$('#situacao_apolice_select_alt').append($('<option>', {value: 3, text : 'Cancelada'}));
-				
-				$('#situacao_apolice_select_alt').selectmenu("refresh");
-			} else if (situacao_aux == 2) {
-				//return "Executado";
-			} else if (situacao_aux == 3) {
-				//return "Cancelada";
-			} else if (situacao_aux == 4) {
-				//return "Em análise";
-				$("#situacao_apolice_select_div_alt").show();
-				
-				$('#situacao_apolice_select_alt').append($('<option>', {value: 4, text : 'Manter situação atual'}));
-				$('#situacao_apolice_select_alt').append($('<option>', {value: 0, text : 'Liberada'}));
-				$('#situacao_apolice_select_alt').append($('<option>', {value: 1, text : 'Confirmada'}));
-				$('#situacao_apolice_select_alt').append($('<option>', {value: 2, text : 'Executada'}));
-				$('#situacao_apolice_select_alt').append($('<option>', {value: 3, text : 'Cancelada'}));
-				$('#situacao_apolice_select_alt').selectmenu("refresh");
-			}
 			
 			$("#index_apolice_alt").val(index_apolice);
 			$("#index_acordo_alt").val(index_acordo);
@@ -893,17 +774,19 @@ function atualizar_links_apolice() {
 			$("#incluir_apolice").hide();
 			$("#alterar_apolice").show();
 			$("#consultar_apolice").hide();
+			$("#detalhar_apolice").hide();
 
 		});
 	});
+	*/
 }
 //fim apolices
 
 
 //inicio funcoes de inicializacoes
 function inicializar_contrato() {
-	$( "#dados_apolice" ).collapsible( "option", "disabled", true );
-	$( "#incluir_apolice_btn" ).attr('disabled','disabled');
+	//$( "#dados_apolice" ).collapsible( "option", "disabled", true );
+	//$( "#incluir_apolice_btn" ).attr('disabled','disabled');
 	
 	setInterval(function () {exibir_mensagem("")}, 2000);
 	
@@ -924,10 +807,10 @@ function inicializar_contrato() {
 	
 	preenchimento_DEBUG();
 	
-	$('#chave_apolice').each(function (index) {
+	$('#codigo_apolice').each(function (index) {
 		$(this).bind('taphold', function (event) {
 			//console.log("TAP HOLD!!");
-			var chave_aux = $("#chave_apolice").val();
+			var chave_aux = $("#codigo_apolice").val();
 			if (chave_aux.trim().length > 0) {
 				$( "#popup_chave p" ).html(chave_aux);
 				$( "#popup_chave" ).popup( "open", { 
@@ -977,6 +860,7 @@ function inicializar_contrato() {
 		$("#incluir_apolice").hide();
 		$("#alterar_apolice").hide();
 		$("#consultar_apolice").hide();
+		$("#detalhar_apolice").hide();
 	});
 
 	$( "#menu-transacoes" ).click(function() {
@@ -993,6 +877,7 @@ function inicializar_contrato() {
 		$("#incluir_apolice").hide();
 		$("#alterar_apolice").hide();
 		$("#consultar_apolice").hide();
+		$("#detalhar_apolice").hide();
 	});
 
 	$( "#sub-menu-sobra" ).click(function() {
@@ -1014,6 +899,7 @@ function inicializar_contrato() {
 		$("#incluir_apolice").hide();
 		$("#alterar_apolice").hide();
 		$("#consultar_apolice").hide();
+		$("#detalhar_apolice").hide();
 	});
 
 	$( "#sub-menu-falta" ).click(function() {
@@ -1035,6 +921,7 @@ function inicializar_contrato() {
 		$("#incluir_apolice").hide();
 		$("#alterar_apolice").hide();
 		$("#consultar_apolice").hide();
+		$("#detalhar_apolice").hide();
 	});
 
 	$( "#menu-acordo" ).click(function() {
@@ -1051,6 +938,7 @@ function inicializar_contrato() {
 		$("#incluir_apolice").hide();
 		$("#alterar_apolice").hide();
 		$("#consultar_apolice").hide();
+		$("#detalhar_apolice").hide();
 	});
 
 	$( "#sub-menu-acordo-consultar" ).click(function() {
@@ -1058,7 +946,7 @@ function inicializar_contrato() {
 		$("#consultar_acordo").html("");
 
 		em_espera_execucao = function() {
-			html_lista_acordo = listarOperacoes(0, "");
+			html_lista_acordo = listarAcordos(0, "");
 			$("#consultar_acordo").html(html_lista_acordo);
 			atualizar_links_acordo();
 			atualizar_links_acordo_pesq();
@@ -1084,6 +972,7 @@ function inicializar_contrato() {
 		$("#incluir_apolice").hide();
 		$("#alterar_apolice").hide();
 		$("#consultar_apolice").hide();
+		$("#detalhar_apolice").hide();
 	});
 
 	$( "#sub-menu-acordo-incluir" ).click(function() {
@@ -1100,6 +989,7 @@ function inicializar_contrato() {
 		$("#incluir_apolice").hide();
 		$("#alterar_apolice").hide();
 		$("#consultar_apolice").hide();
+		$("#detalhar_apolice").hide();
 	});
 
 	$( "#incluir_acordo_btn" ).click(function() {
@@ -1179,6 +1069,7 @@ function inicializar_contrato() {
 		$("#incluir_apolice").hide();
 		$("#alterar_apolice").hide();
 		$("#consultar_apolice").hide();
+		$("#detalhar_apolice").hide();
 	});
 
 	$( "#sub-menu-apolice-consultar" ).click(function() {
@@ -1186,7 +1077,7 @@ function inicializar_contrato() {
 		$("#consultar_apolice").html("");
 
 		em_espera_execucao = function() {
-			html_lista_apolice = listarapolices(0, "", "", 9);
+			html_lista_apolice = listarapolices(0, "");
 			$("#consultar_apolice").html(html_lista_apolice);
 			atualizar_links_apolice();
 			atualizar_links_apolice_pesq();
@@ -1212,6 +1103,7 @@ function inicializar_contrato() {
 		$("#incluir_apolice").hide();
 		$("#alterar_apolice").hide();
 		$("#consultar_apolice").show();
+		$("#detalhar_apolice").hide();
 	});
 
 	$( "#sub-menu-apolice-incluir" ).click(function() {
@@ -1219,7 +1111,7 @@ function inicializar_contrato() {
 		
 		em_espera_execucao = function() {
 			sub_menu_apolice_incluir_limpar();
-			inicializar_autocomplete_acordo();
+			//inicializar_autocomplete_acordo();
 			preenchimento_DEBUG();
 		};
 
@@ -1243,33 +1135,33 @@ function inicializar_contrato() {
 		$("#incluir_apolice").show();
 		$("#alterar_apolice").hide();
 		$("#consultar_apolice").hide();
+		$("#detalhar_apolice").hide();
 	});
 	
-	$( "#chave_apolice" ).blur(function() {
+	$( "#codigo_apolice" ).blur(function() {
 		//alert( "Verificando a chave da apolice" );
-		var chave_apolice = $("#chave_apolice").val().toString();
+		var codigo_apolice = $("#codigo_apolice").val().toString();
 		
-		if (chave_apolice.length < 44)
+		if (codigo_apolice.length < 44)
 			return;
 		
 		
-		modulo11_result = calculaDigitoMod11(chave_apolice.substring(0, chave_apolice.length-1), 1, 44, true);
+		modulo11_result = calculaDigitoMod11(codigo_apolice.substring(0, codigo_apolice.length-1), 1, 44, true);
 		
-		if (modulo11_result != chave_apolice.substring(chave_apolice.length-1, chave_apolice.length)) {
-			$("#chave_apolice").css('border', '1px solid red');
-			$("#chave_apolice").focus();
+		if (modulo11_result != codigo_apolice.substring(codigo_apolice.length-1, codigo_apolice.length)) {
+			$("#codigo_apolice").css('border', '1px solid red');
+			$("#codigo_apolice").focus();
 		} else {
-			$("#chave_apolice").css('border', 'none');
+			$("#codigo_apolice").css('border', 'none');
 		}
 		
-		var chave_apolice_big = new BigNumber(chave_apolice, 10);
+		var codigo_apolice_big = new BigNumber(codigo_apolice, 10);
 
-		//dados_apolice = cosseguro.consultar_apolice(chave_apolice_big);
+		//dados_apolice = cosseguro.consultar_apolice(codigo_apolice_big);
 		
 		arr_aux_apolice = dados_apolice.toString().split(",");
 
 		var dataCriacao = arr_aux_apolice[0].replace(/[^\x20-\x7E]+/g, '').trim();
-		situacao = parseInt(dataCriacao);
 		
 		var cnpj_emissor = arr_aux_apolice[1].toString().replace(/[^\x20-\x7E]+/g, '').trim();
 		if (cnpj_emissor == "0") cnpj_emissor = "";
@@ -1280,121 +1172,77 @@ function inicializar_contrato() {
 		var valor = arr_aux_apolice[3].toString().replace(/[^\x20-\x7E]+/g, '').trim();
 		valor = parseInt(valor);
 		
-		var situacao = arr_aux_apolice[4].toString().replace(/[^\x20-\x7E]+/g, '').trim();
-		situacao = parseInt(situacao);
+		$("#cnpj_emissor").val(cnpj_emissor);
+		MascaraCNPJ($('#cnpj_emissor')[0]);
+		$("#cpf_cnpj_sacado").val(cpf_cnpj_sacado);
+		MascaraCNPJ($('#cpf_cnpj_sacado')[0]);
+		$("#valor_apolice").val(valor);
+		$( "#dados_apolice" ).collapsible( "option", "disabled", false );
 		
-		var situacao_desc = arr_aux_apolice[5].toString().replace(/[^\x20-\x7E]+/g, '').trim();
+		//$( "#incluir_apolice_btn" ).removeAttr('disabled');
 		
-		if (situacao == 0) {
-            //desc_situacao = "Liberada";
-			
-			$("#cnpj_emissor").val(cnpj_emissor);
-			MascaraCNPJ($('#cnpj_emissor')[0]);
-			$("#cpf_cnpj_sacado").val(cpf_cnpj_sacado);
-			MascaraCNPJ($('#cpf_cnpj_sacado')[0]);
-			$("#valor_apolice").val(valor);
-			$( "#dados_apolice" ).collapsible( "option", "disabled", false );
-			
-			$( "#incluir_apolice_btn" ).removeAttr('disabled');
-			
-			$("#dados_apolice").collapsible( "expand" );
-			
-			preenchimento_DEBUG();
+		//$("#dados_apolice").collapsible( "expand" );
+		
+		preenchimento_DEBUG();
 
-			chave_apolice_verificada = true;
-        } else if (situacao == 1) {
-            //desc_situacao = "Alocada";
-			alert("A apolice informada já está alocada");
-			$("#chave_apolice").val("");
-			$( "#dados_apolice" ).collapsible( "option", "disabled", true );
-			$( "#incluir_apolice_btn" ).attr('disabled','disabled');
-			return;
-        } else if (situacao == 2) {
-            //desc_situacao = "Quitada / Executado";
-			alert("A apolice informada foi executada");
-			$("#chave_apolice").val("");
-			$( "#dados_apolice" ).collapsible( "option", "disabled", true );
-			$( "#incluir_apolice_btn" ).attr('disabled','disabled');
-			return;
-        } else if (situacao == 3) {
-            desc_situacao = "Cancelada";
-			alert("A apolice informada foi cancelada");
-			$("#chave_apolice").val("");
-			$( "#dados_apolice" ).collapsible( "option", "disabled", true );
-			$( "#incluir_apolice_btn" ).attr('disabled','disabled');
-			return;
-        } else if (situacao == 4) {
-            desc_situacao = "Em análise";
-			alert("A apolice informada está em análise");
-			$("#chave_apolice").val("");
-			$( "#dados_apolice" ).collapsible( "option", "disabled", true );
-			$( "#incluir_apolice_btn" ).attr('disabled','disabled');
-			return;
-        } else {
-			preenchimento_DEBUG();
-		}
-		
+		codigo_apolice_verificada = true;
 	});
 	
-	$( "#chave_apolice" ).bind('input', function(){
-		if ($('#chave_apolice').val().length == 44) {
-			$('#chave_apolice').blur(); 
+	$( "#codigo_apolice" ).bind('input', function(){
+		if ($('#codigo_apolice').val().length == 44) {
+			$('#codigo_apolice').blur(); 
 		}
 	});
 	
 	$( "#incluir_apolice_btn" ).click(function() {
-		if (!chave_apolice_verificada) {
-			alert("Chave da Duplicata não verificada");
-			return
-		}
-		
-		
-		var codigo_op = $("#codigo_op").val().toString();
-		if (!validacao_simples($("#codigo_op"), "Código informado da operação é inválido"))
+		var codigo_apolice = $("#cad_apolice_codigo").val().toString();
+		if (!validacao_simples($("#cad_apolice_codigo"), "Código informado da operação é inválido"))
 			return;
 		
-		var chave_apolice = $("#chave_apolice").val().toString();
-		
-		var cpf_cnpj_sacado = formata_numero_subida($("#cpf_cnpj_sacado").val().toString());
-		if (!validacao_simples($("#cpf_cnpj_sacado"), "CPF/CNPJ informado é inválido"))
+		var valor_premio = formata_numero_subida($("#cad_apolice_valor_premio").val().toString());
+		if (!validacao_simples($("#cad_apolice_valor_premio"), "cad_apolice_valor_premio é inválido"))
 			return;
 		
-		var cnpj_emissor = formata_numero_subida($("#cnpj_emissor").val().toString());
-		if (!validacao_simples($("#cnpj_emissor"), "CNPJ do emissor informado é inválido"))
+		var valor_cobertura = formata_numero_subida($("#cad_apolice_valor_cobertura").val().toString());
+		if (!validacao_simples($("#cad_apolice_valor_cobertura"), "cad_apolice_valor_cobertura é inválido"))
 			return;
 		
-		var valor_apolice = ($("#valor_apolice").val().toString());
-		if (!validacao_simples($("#valor_apolice"), "Valor informado é inválido"))
+		var dt_vencimento = $( "#cad_apolice_dt_vencimento" ).date( "getDate" );;
+		if (!validacao_simples($("#cad_apolice_dt_vencimento"), "cad_apolice_dt_vencimento informado é inválido"))
 			return;
-		
-		var situacao_nova_apolice;
-		
-		if ($("#situacao_nova_apolice")[0].checked) {
-			situacao_nova_apolice = 4;
-		} else {
-			situacao_nova_apolice = 1;
-		}
-
-		var chave_apolice_big = new BigNumber(chave_apolice, 10);
-		var cnpj_emissor_big = new BigNumber(cnpj_emissor, 10);
-		var cpf_cnpj_sacado_big = new BigNumber(cpf_cnpj_sacado, 10);
-
-		valor_apolice = formata_valor_subida(valor_apolice);
-		//valor_apolice = valor_apolice.replace(".","").replace(",","");
 
 		sub_menu_apolice_incluir_limpar();
 		
 		preenchimento_DEBUG();
-		
-		var aux_valor = parseInt(valor_apolice);
 
+		var _data = {};
+		_data.codigo_apolice = codigo_apolice;
+		_data.valor_premio = parseInt(formata_valor_subida(valor_premio));
+		_data.valor_cobertura = parseInt(formata_valor_subida(valor_cobertura));
+		_data.dt_vencimento = dt_vencimento.getTime();
+		_data.usuario = usuario;
+		
+		//alert(_data + '\n' + this.id);
+		postAjax("/cadastrar_apolice", 
+			_data, 
+			function(data) {
+				//$("#retorno_login").html(data);
+				if (data.sucesso) {
+					arrTransacoes.push(data.txHash + "|false|" + data.funcao + "|||" + codigo_apolice);
+					alert("Em andamento a minera&ccedil;&atilde;o da nova apolice");
+				} else {
+					alert(data.msg);
+				}
+			}, function(errMsg) {
+				alert(errMsg);
+			});
 		/*
-		cosseguro.incluir_apolice.sendTransaction(chave_apolice_big, cnpj_emissor_big, cpf_cnpj_sacado_big, valor_apolice, situacao_nova_apolice, codigo_op, {
+		cosseguro.incluir_apolice.sendTransaction(codigo_apolice, valor_premio, valor_cobertura, valor_apolice, dt_vencimento, {
 		from: web3.eth.coinbase, gas: config[3].GAS }, function(err, txHash) {
 				if (err != null) {
 					//alert("Erro: " + err.message);
 				} else {
-					arrTransacoes.push(txHash + "|false|Inclus&atilde;o de apolice|||" + chave_apolice);
+					arrTransacoes.push(txHash + "|false|Inclus&atilde;o de apolice|||" + codigo_apolice);
 					alert("Em andamento a minera&ccedil;&atilde;o da nova apolice");
 				}
 			}
@@ -1410,7 +1258,7 @@ function inicializar_contrato() {
 		if (!validacao_simples($("#cpf_cnpj_sacado_alt"), "CPF/CNPJ informado &eacute; inv&aacute;lido"))
 			return;
 		
-		var chave_apolice = blockchain.operacoes[index_acordo_alt].apolices[index_apolice_alt].chave;
+		var codigo_apolice = blockchain.acordos[index_acordo_alt].apolices[index_apolice_alt].chave;
 		
 		var cnpj_emissor_alt = formata_numero_subida($("#cnpj_emissor_alt").val().toString());
 		if (!validacao_simples($("#cnpj_emissor_alt"), "CNPJ do emissor informado &eacute; inv&aacute;lido"))
@@ -1421,9 +1269,7 @@ function inicializar_contrato() {
 			return;
 		
 		
-		var situacao_nova_apolice = $("#situacao_apolice_select_alt").val(); //[0].selectedIndex;
-
-		var chave_apolice_big = new BigNumber(chave_apolice, 10);
+		var codigo_apolice_big = new BigNumber(codigo_apolice, 10);
 		var cnpj_emissor_big = new BigNumber(cnpj_emissor_alt, 10);
 		var cpf_cnpj_sacado_big = new BigNumber(cpf_cnpj_sacado_alt, 10);
 
@@ -1440,12 +1286,12 @@ function inicializar_contrato() {
 		preenchimento_DEBUG();
 		
 		/*
-		cosseguro.alterar_apolice.sendTransaction(chave_apolice_big, cnpj_emissor_big, cpf_cnpj_sacado_big, valor_apolice_alt, situacao_nova_apolice, {
+		cosseguro.alterar_apolice.sendTransaction(codigo_apolice_big, cnpj_emissor_big, cpf_cnpj_sacado_big, valor_apolice_alt, situacao_nova_apolice, {
 		from: web3.eth.coinbase, gas: config[3].GAS }, function(err, txHash) {
 				if (err != null) {
 					//alert("Erro: " + err.message);
 				} else {
-					arrTransacoes.push(txHash + "|false|Altera&ccedil;&atilde;o de apolice|||" + chave_apolice.toString());
+					arrTransacoes.push(txHash + "|false|Altera&ccedil;&atilde;o de apolice|||" + codigo_apolice.toString());
 					alert("Em andamento a minera&ccedil;&atilde;o da altera&ccedil;&atilde;o da apolice");
 				}
 			}
@@ -1453,8 +1299,13 @@ function inicializar_contrato() {
 		*/
 	});
 
+
+	socket.on('ret_sendTr_incluir_apolice', function (data_str) {
+		var data = JSON.parse(data_str);
+		registrarEvento(data.funcao, data.txHash, data.sucesso, "", data.cod_retorno);
+	});
 	/*
-    //event ret_incluir_apolice(uint128 chave, uint cnpj_emissor, uint cpf_cnpj_sacado, uint64 valor, uint8 situacao, string codigo_op, uint index_alocacao, int cod_erro, string descricao);
+    //event ret_incluir_apolice(uint128 chave, uint cnpj_emissor, uint cpf_cnpj_sacado, uint64 valor, uint8 situacao, string codigo_apolice, uint index_alocacao, int cod_erro, string descricao);
     cosseguro.ret_incluir_apolice(function(error, result){
 		if (error != null) {
 			registrarEvento("Inclus&atilde;o de Duplicata", result.transactionHash, false, result, error, "", 0);
@@ -1473,7 +1324,7 @@ function inicializar_contrato() {
 		}
 	});
 
-	//event ret_incluir_acordo(string codigo_op, uint64 valor, int cod_erro, string descricao);
+	//event ret_incluir_acordo(string codigo_apolice, uint64 valor, int cod_erro, string descricao);
     cosseguro.ret_incluir_acordo(function(error, result){
 		if (error != null) {
 			registrarEvento("Inclus&atilde;o de Opera&ccedil;&atilde;o", result.transactionHash, false, result, error, "", 0);
@@ -1483,7 +1334,7 @@ function inicializar_contrato() {
 		}
 	});
 
-	//event ret_alterar_acordo(string codigo_op, uint64 valor_atualizado, int cod_erro, string descricao);
+	//event ret_alterar_acordo(string codigo_apolice, uint64 valor_atualizado, int cod_erro, string descricao);
     cosseguro.ret_alterar_acordo(function(error, result){
 		if (error != null) {
 			registrarEvento("Altera&ccedil;&atilde;o de Opera&ccedil;&atilde;o", result.transactionHash, false, result, error, "", 0);
@@ -1496,7 +1347,7 @@ function inicializar_contrato() {
 
 	atualiza_cache_blockchain();
 
-	sleep(10);
+	//sleep(10);
 
 	//$.mobile.loading( 'hide' );
 
@@ -1517,10 +1368,11 @@ Number.prototype.format = function(n, x, s, c) {
 };
 
 alert = function(txt) {
-	registrarEvento(txt, "", "", "", "", "alerta")
+	registrarEvento(txt, "", "", "alerta", "")
 	exibir_mensagem("alerta");
 }
 
+/*
 function sleep(milliseconds) {
 	var start = new Date().getTime();
 	for (var i = 0; i < 1e7; i++) {
@@ -1529,6 +1381,7 @@ function sleep(milliseconds) {
 		}
 	}
 }
+*/
 
 function preenchimento_DEBUG() {
 	if (!DEBUG)
@@ -1597,11 +1450,11 @@ function formata_valor_descida(valor, sem_ponto) {
 function validacao_simples(obj, mensagem) {
 	var dado = obj.val();
 	if (dado.trim().length == 0 || dado.trim() == "0" || dado.trim() == "0,00") {
-		$("#chave_apolice").css('border', '1px solid red');
+		$("#codigo_apolice").css('border', '1px solid red');
 		alert(mensagem);
 		return false;
 	}
-	$("#chave_apolice").css('border', 'none');
+	$("#codigo_apolice").css('border', 'none');
 	return true;
 }
 
@@ -1629,92 +1482,16 @@ function atualiza_cache_blockchain() {
 		});
 
 
-	sleep(10);
+	//sleep(10);
 }
 
 function atualiza_cache_blockchain_aux(_blockchain) {
-	sleep(20);
+	//sleep(20);
 
 	if (!block_pend_atualizacao)
 		return;
 
-	var arr_operacoes = [];
-	var total_loops = 0;//cosseguro.contar_operacoes();
-	for (var i=0; i < total_loops; i++) {
-		arr_operacoes[i] = 0; //cosseguro.consultar_acordo(i);
-	}
-
-	var arr_associacoes = [];
-	total_loops = 0; //cosseguro.contar_alocacoes();
-	for (var i=0; i < total_loops; i++) {
-		arr_associacoes[i] = 0; //cosseguro.consultar_alocacao(i);
-	}
-
-	var json_aux = '{';
-	json_aux += '"operacoes":[';
-	var arr_aux_acordo = [];
-	var arr_aux_apolice = [];
-
-	var virgula_acordo = '';
-	var virgula_apolice = '';
-
-	for (var g=0; g < arr_operacoes.length; g++) {
-		virgula_apolices = '';
-		dados_acordo = arr_operacoes[g];
-		arr_aux_acordo = dados_acordo.toString().split(",");
-
-		codigo_op_aux = arr_aux_acordo[0].replace(/[^\x20-\x7E]+/g, '') + "";
-		valor_op_aux = arr_aux_acordo[1];
-		valor_atualizado_op_aux = arr_aux_acordo[2];
-
-		json_aux += virgula_acordo;
-		json_aux += '{';
-		json_aux += '"codigo_op":"' + codigo_op_aux + '",';
-		json_aux += '"valor":"' + valor_op_aux + '",';
-		json_aux += '"valor_atualizado":"' + valor_atualizado_op_aux + '",';
-
-		json_aux += '"apolices":[';
-		for (var i=0; i < arr_associacoes.length; i++) {
-
-			chave_ass_aux = arr_associacoes[i][0].toString(10);
-			codigo_op_ass_aux = arr_associacoes[i][1].replace(/[^\x20-\x7E]+/g, '').trim();
-			ativa_ass_aux = arr_associacoes[i][2];
-
-			if (codigo_op_ass_aux == codigo_op_aux && ativa_ass_aux) {
-				dados_apolice = 0; //cosseguro.consultar_apolice(chave_ass_aux);
-				arr_aux_apolice = dados_apolice.toString().split(",");
-
-				dataCriacao = arr_aux_apolice[0].replace(/[^\x20-\x7E]+/g, '').trim();
-				cnpj_emissor = formata_numero_decida(arr_aux_apolice[1].toString().replace(/[^\x20-\x7E]+/g, '').trim());
-				cpf_cnpj_sacado = formata_numero_decida(arr_aux_apolice[2].toString().replace(/[^\x20-\x7E]+/g, '').trim());
-				valor = arr_aux_apolice[3].toString().replace(/[^\x20-\x7E]+/g, '').trim();
-				situacao = arr_aux_apolice[4].toString().replace(/[^\x20-\x7E]+/g, '').trim();
-				if (situacao != "0") {
-					json_aux += virgula_apolice;
-					json_aux += '{';
-					json_aux += '"chave":"' + chave_ass_aux + '",';
-					json_aux += '"dataCriacao":"' + dataCriacao + '",';
-					json_aux += '"cnpj_emissor":"' + cnpj_emissor + '",';
-					json_aux += '"cpf_cnpj_sacado":"' + cpf_cnpj_sacado + '",';
-					json_aux += '"valor":"' + valor + '",';
-					json_aux += '"situacao":"' + situacao + '"';
-					json_aux += '}';
-					virgula_apolice = ',';
-				}
-
-			}
-		}
-
-		json_aux += ']';
-		json_aux += '}';
-
-		virgula_acordo = ',';
-		virgula_apolice = '';
-	}
-	json_aux += ']';
-	json_aux += '}';
-
-	blockchain = JSON.parse(json_aux);
+	blockchain = _blockchain;
 	block_pend_atualizacao = false;
 
 	retiraLoding();

@@ -5,12 +5,13 @@
         <tr><td>Código:</td><td><input id="cad_apolice_codigo" maxlength="44" /></td></tr>
         <tr><td>Valor Prêmio:</td><td><input id="cad_apolice_valor_premio" maxlength="16" /></td></tr>
         <tr><td>Valor Cobertura:</td><td><input id="cad_apolice_valor_cobertura" maxlength="16" /></td></tr>
-        <tr><td>Data de Vencimento:</td><td><input id="cad_apolice_dt_vencimento" maxlength="16" /></td></tr>
+        <tr><td>Data de Vencimento:</td><td><input id="cad_apolice_dt_vencimento" type="text" data-role="date" /></td></tr>
     </table>
+
+
     
     <button id="incluir_apolice_btn">Incluir Apólice</button>
 
-    <div id="incluir_apolice_lista_apolices"></div>
 </div>
 
 <div id="alterar_apolice" style="display:none;">
@@ -25,6 +26,20 @@
     <input type="hidden" id="index_apolice_alt" />
     <input type="hidden" id="index_operacao_alt" />
     <button id="alterar_apolice_btn">Alterar Apólice</button>
+</div>
+
+<div id="detalhar_apolice" style="display:none;">
+    <b class="title">Detalhamento da Apólice</b>
+    <table>
+        <tr><td>Código:</td><td><span id="det_apolice_codigo"></span></td></tr>
+        <tr><td>Valor Prêmio:</td><td><span id="det_apolice_valor_premio"></span></td></tr>
+        <tr><td>Valor Cobertura:</td><td><span id="det_apolice_valor_cobertura"></span></td></tr>
+        <tr><td>Data de Vencimento:</td><td><span id="det_apolice_dt_vencimento"></span></td></tr>
+    </table>
+    <br />
+    <b class="title">Participações no Cosseguro</b>
+    <div id="detalhar_apolice__lista_acordos"></div>
+    <button id="btn_apolice__incluir_acordo">Incluir Seguradora</button>
 </div>
 
 <div id="consultar_apolice" style="display:none;"></div>

@@ -138,21 +138,21 @@ contract Cosseguro
         }
     }
 
-    function consultar_apolice_seguradora(uint _index_apolice, uint _index_seguradora) constant returns (string, uint64, uint64, uint, uint, address, uint16) {
+    function consultar_apolice_seguradora(uint _index_apolice, uint _index_seguradora) constant returns (string, uint64, uint64, uint, address, uint16, bool) {
         Apolice memory apolice_aux = apolices[_index_apolice];
         
         if (apolice_aux.owner != msg.sender) {
-            return ("", 0, 0, 0, 0, 0, 0);
+            return ("", 0, 0, 0, 0, 0, false);
         } else {
             uint qtde_seguradoras = apolice_aux.addr_seguradora.length;
 
             if (_index_seguradora >= apolice_aux.addr_seguradora.length) {
-                return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.cobertura, apolice_aux.dt_vencimento, qtde_seguradoras, 0, 0);
+                return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.cobertura, apolice_aux.dt_vencimento, 0, 0, false);
             } else {
                 address addr_seguradora_aux = apolice_aux.addr_seguradora[_index_seguradora];
                 Acordo memory acordo_aux = acordos[addr_seguradora_aux];
                 uint index_acordo_aux =  apolice_aux.index_acordo[_index_seguradora];
-                return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.cobertura, apolice_aux.dt_vencimento, qtde_seguradoras, addr_seguradora_aux, acordo_aux.percent[index_acordo_aux]);
+                return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.cobertura, apolice_aux.dt_vencimento, addr_seguradora_aux, acordo_aux.percent[index_acordo_aux], acordo_aux.autorizado[index_acordo_aux]);
             }
         }
     }
