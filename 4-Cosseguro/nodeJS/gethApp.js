@@ -11,15 +11,16 @@ var web3_node1 = new Web3();
 var web3_node2 = new Web3();
 var web3_node3 = new Web3();
 var web3_node4 = new Web3();
-//web3_node1.setProvider(new web3_node1.providers.HttpProvider('http://ec2-52-50-42-100.eu-west-1.compute.amazonaws.com:80'));
+//web3_node1.setProvider(new web3_node1.providers.HttpProvider('http://prodnode2.no-ip.org:80'));
 web3_node1.setProvider(new web3_node1.providers.HttpProvider('http://localhost:8545'));
-//web3_node2.setProvider(new web3_node1.providers.HttpProvider('http://localhost:8545'));
-//web3_node3.setProvider(new web3_node1.providers.HttpProvider('http://localhost:8545'));
-//web3_node4.setProvider(new web3_node1.providers.HttpProvider('http://localhost:8545'));
 
 var cosseguroABI = [{"constant":true,"inputs":[],"name":"contar_apolices","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[{"name":"_index_apolice","type":"uint256"},{"name":"_index_seguradora","type":"uint256"}],"name":"consultar_apolice_seguradora","outputs":[{"name":"","type":"string"},{"name":"","type":"uint64"},{"name":"","type":"uint64"},{"name":"","type":"uint256"},{"name":"","type":"address"},{"name":"","type":"uint16"},{"name":"","type":"bool"}],"type":"function"},{"constant":false,"inputs":[{"name":"_index_apolice_cedido","type":"uint256"},{"name":"_index_acordo_aceito","type":"uint256"},{"name":"_addr_cedido","type":"address"}],"name":"autorizar_acordo","outputs":[],"type":"function"},{"constant":false,"inputs":[{"name":"_a","type":"string"},{"name":"_b","type":"string"}],"name":"compare","outputs":[{"name":"","type":"int256"}],"type":"function"},{"constant":false,"inputs":[{"name":"_a","type":"string"},{"name":"_b","type":"string"}],"name":"equal","outputs":[{"name":"","type":"bool"}],"type":"function"},{"constant":true,"inputs":[{"name":"_adress_aux","type":"address"},{"name":"_index_acordo","type":"uint256"}],"name":"apagar_consultar_acordo_aux","outputs":[{"name":"","type":"uint256"},{"name":"","type":"uint64"},{"name":"","type":"bool"}],"type":"function"},{"constant":true,"inputs":[{"name":"_index_apolice","type":"uint256"}],"name":"contar_index_acordo","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[{"name":"_index_apolice","type":"uint256"}],"name":"consultar_apolice","outputs":[{"name":"","type":"string"},{"name":"","type":"uint64"},{"name":"","type":"uint64"},{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"address"},{"name":"","type":"uint256"},{"name":"","type":"address"},{"name":"","type":"uint256"},{"name":"","type":"address"},{"name":"","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[{"name":"_index_apolice","type":"uint256"}],"name":"contar_seguradoras","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":false,"inputs":[{"name":"_haystack","type":"string"},{"name":"_needle","type":"string"}],"name":"indexOf","outputs":[{"name":"","type":"int256"}],"type":"function"},{"constant":false,"inputs":[{"name":"_index_apolice","type":"uint256"},{"name":"_percent_acordo","type":"uint16"},{"name":"_addr_seguradora_aceito","type":"address"}],"name":"incluir_acordo","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"_index_apolice","type":"uint256"},{"name":"_index_acordo","type":"uint256"}],"name":"apagar_consultar_index_acordo","outputs":[{"name":"","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[{"name":"_index_apolice","type":"uint256"}],"name":"apagar_consultar_apolice_aux","outputs":[{"name":"","type":"string"},{"name":"","type":"uint64"},{"name":"","type":"uint64"},{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"address"},{"name":"","type":"uint256"}],"type":"function"},{"constant":true,"inputs":[{"name":"_index_apolice","type":"uint256"},{"name":"_adress_aux","type":"address"},{"name":"_index_acordo","type":"uint256"}],"name":"consultar_acordo_aceito","outputs":[{"name":"","type":"uint64"},{"name":"","type":"bool"}],"type":"function"},{"constant":false,"inputs":[{"name":"_codigo","type":"string"},{"name":"_premio","type":"uint64"},{"name":"_cobertura","type":"uint64"},{"name":"_dt_vencimento","type":"uint256"}],"name":"incluir_apolice","outputs":[],"type":"function"},{"constant":true,"inputs":[{"name":"_index_acordo","type":"uint256"}],"name":"consultar_acordo","outputs":[{"name":"","type":"uint256"},{"name":"","type":"uint64"},{"name":"","type":"bool"}],"type":"function"},{"inputs":[],"type":"constructor"},{"anonymous":false,"inputs":[{"indexed":false,"name":"codigo","type":"string"},{"indexed":false,"name":"premio","type":"uint64"},{"indexed":false,"name":"cobertura","type":"uint64"},{"indexed":false,"name":"dt_vencimento","type":"uint256"},{"indexed":false,"name":"qtde_seguradoras","type":"uint256"},{"indexed":false,"name":"index_array_apolice","type":"uint256"},{"indexed":false,"name":"index_array_seguradoras","type":"uint256"},{"indexed":false,"name":"index_array_acordo","type":"uint256"},{"indexed":false,"name":"sucesso","type":"bool"},{"indexed":false,"name":"cod_retorno","type":"int256"},{"indexed":false,"name":"descricao","type":"string"}],"name":"ret_incluir_apolice","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"index_apolice","type":"uint256"},{"indexed":false,"name":"percent_acordo","type":"uint64"},{"indexed":false,"name":"addr_seguradora_aceito","type":"address"},{"indexed":false,"name":"index_array_acordo","type":"uint256"},{"indexed":false,"name":"sucesso","type":"bool"},{"indexed":false,"name":"cod_retorno","type":"int256"},{"indexed":false,"name":"descricao","type":"string"}],"name":"ret_incluir_acordo","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"index_apolice_cedido","type":"uint256"},{"indexed":false,"name":"index_acordo_aceito","type":"uint256"},{"indexed":false,"name":"addr_cedido","type":"address"},{"indexed":false,"name":"sucesso","type":"bool"},{"indexed":false,"name":"cod_retorno","type":"int256"},{"indexed":false,"name":"descricao","type":"string"}],"name":"ret_autorizar_acordo","type":"event"}];
 
-const cosseguroAddress = "0x83b50c2a806213d9c7c7dbcf3d197dc12b5cf549"; //localhost
+//const cosseguroAddress = "0x83b50c2a806213d9c7c7dbcf3d197dc12b5cf549"; //localhost
+//const cosseguroAddress = "0xf506a2c7971e36a46f9365514e3385ce7fb5f6fa"; //v1 produção (compilador: ligar flag de otimização)
+//const cosseguroAddress = "0x80d6273ba5c5090d147c29a02ec5175686c43d2c"; //v2 produção (compilador: ligar flag de otimização)
+//const cosseguroAddress = "0xd21b2b8e1cad2bc2c72f5bece353b5d22f1e9417"; //v3 produção (compilador: ligar flag de otimização)
+const cosseguroAddress = "0x39abecea99c29c5d48b5cf7e63eebe4084c1b3d7"; //v4 produção (compilador: ligar flag de otimização)
 
 var cosseguroABI_o = web3_node1.eth.contract(cosseguroABI);
 var cosseguro = cosseguroABI_o.at(cosseguroAddress);
@@ -84,10 +85,10 @@ sio.sockets.on('connection', (socket) => {
     if (typeof users[sessionID] !== 'undefined' && users[sessionID]) {
         //Não fazer nada, pois sessao já está criada.
         users[sessionID].socketId = socket.id;
-        console.log("Usuario re-conectado: " + sessionID);
+        console.log("Usuario re-conectado: " + sessionID + ' >> socket.id: ' + socket.id);
     } else {
         users[sessionID] = {"ip": ip, "userName": "", "socketId": socket.id, "blockchain": {}, "seguradora": 0};
-        console.log("Novo usuario conectado: " + sessionID);
+        console.log("Novo usuario conectado: " + sessionID + ' >> socket.id: ' + socket.id);
     }
 
     socket.emit(
@@ -153,6 +154,7 @@ app.post('/login', function (req, res) {
 
     var retorno = {};
     retorno.msg = "";
+    retorno.loginError = false;
     retorno.msgTecnica = "";
     retorno.sucesso = true;
     
@@ -161,11 +163,12 @@ app.post('/login', function (req, res) {
         retorno.msg = "Sessao não foi criada. Recarregue a página";
         retorno.msgTecnica = "app.post('/login', function (req, res) >> if (!sessionValid(\"\", req)) {";
         retorno.sucesso = false;
+        retorno.loginError = true;
     } else {
         if (usuario == "rodrigo" && senha == "plata") { //incluir validação de usuario pelo MongoDB
             users[req.sessionID].userName = usuario;
             users[req.sessionID].seguradora = 1;
-            blockchain_seguradoras[users[req.sessionID].seguradora] = {"dt_expiracao": 0, "blockchain": {}};
+            blockchain_seguradoras[users[req.sessionID].seguradora] = {"dt_expiracao": 0, forcar_atualizacao: false, "blockchain": {}};
 
             console.log('>>>>> app.post >> /login >> usuário autenticado >> userName = ' + usuario);
             console.log('>>>>> app.post >> /login >> usuário autenticado >> req.sessionID = ' + req.sessionID);
@@ -187,13 +190,13 @@ app.post('/login', function (req, res) {
 function recuperaBlockchainSeguradora(id_seguradora) {
     if (typeof blockchain_seguradoras[id_seguradora].blockchain.apolices !== 'undefined' && blockchain_seguradoras[id_seguradora].blockchain.apolices) {
         var dt_expiracao_blockchain = blockchain_seguradoras[id_seguradora].dt_expiracao;
+        var forcar_atualizacao = blockchain_seguradoras[id_seguradora].forcar_atualizacao;
 
-        return blockchain_seguradoras[id_seguradora].blockchain;
-    } else {
-        return {};
+        if (!forcar_atualizacao)
+            return blockchain_seguradoras[id_seguradora].blockchain;
     }
-    
-    
+
+    return {};   
 }
 
 /////////////////////////////////////////////
@@ -220,12 +223,14 @@ app.post('/cadastrar_apolice', urlencodedParser, function (req, res) {
     retorno.apolice.valor_premio = valor_premio;
     retorno.apolice.valor_cobertura = valor_cobertura;
     retorno.apolice.dt_vencimento = dt_vencimento;
-    
+    retorno.loginError = false;
+
     res.writeHead("200", {"Content-Type": "application/json"});
     
     if (!sessionValid(req.body.usuario, req)) {
         retorno.msg = "usuário inválido!";
         retorno.msgTecnica = "/cadastrar_apolice >> sessionValid -> req.body.usuario = " + req.body.usuario;
+        retorno.loginError = true;
         console.log(">>>>> " + retorno.msgTecnica);
         res.end(JSON.stringify(retorno));
         return false;
@@ -308,18 +313,20 @@ app.post('/cadastrar_apolice', urlencodedParser, function (req, res) {
 
 //event ret_incluir_apolice(string codigo, uint64 premio, uint64 cobertura, uint dt_vencimento, uint qtde_seguradoras, uint index_array_apolice, uint index_array_seguradoras, uint index_array_acordo, bool sucesso, int cod_retorno, string descricao);
 cosseguro.ret_incluir_apolice(function(error, result){
-    if (typeof txHashs[result.transactionHash] !== 'undefined' && txHashs[result.transactionHash]) {
-        if (typeof users[txHashs[result.transactionHash]] !== 'undefined' && users[txHashs[result.transactionHash]]) {
-            var _socketId = users[txHashs[result.transactionHash]].socketId;
-
-            if (typeof sio.sockets.connected[_socketId] !== 'undefined' && sio.sockets.connected[_socketId]) {
+    var _sessionID = txHashs[result.transactionHash]; 
+    if (typeof _sessionID !== 'undefined' && _sessionID) {
+        var _user = users[_sessionID]; 
+        if (typeof _user !== 'undefined' && _user) {
+            var _socketId = _user.socketId;
+            var _socket = sio.sockets.connected[_socketId]; 
+            if (typeof _socket !== 'undefined' && _socket) {
                 console.log('>>>>> event cosseguro.ret_incluir_apolice >> evento recebido do GETH e enviado para o client >> ponto 1');
                 var retorno = {};
                 
                 retorno.msg = "";
                 retorno.txHash = result.transactionHash;
                 console.log('>>>>> event cosseguro.ret_incluir_apolice >> ponto 2 >> result.transactionHash = ' + result.transactionHash);
-                console.log('>>>>> event cosseguro.ret_incluir_apolice >> ponto 3 >> txHashs[result.transactionHash] = ' + txHashs[result.transactionHash]);
+                console.log('>>>>> event cosseguro.ret_incluir_apolice >> ponto 3 >> _sessionID = ' + _sessionID);
                 retorno.retornoApresentado = false;
                 retorno.sucesso = false;
                 retorno.funcao = "Cadastro de apolice";
@@ -331,16 +338,20 @@ cosseguro.ret_incluir_apolice(function(error, result){
                 retorno.apolice.valor_cobertura = result.args.cobertura;
                 retorno.apolice.dt_vencimento = result.args.dt_vencimento;
                 
-                if (error != null) {
-                    retorno.msgTecnica = "Codigo do erro: " + result.args.cod_retorno + '\n descricao: ' + result.args.descricao;
+                var cod_retorno = parseInt(result.args.cod_retorno.toString());
+
+                if (error != null || cod_retorno < 0) {
+                    retorno.msgTecnica = "Codigo do erro: " + cod_retorno + '\n descricao: ' + result.args.descricao;
                     retorno.sucesso_alt_blockchain = false;
                     retorno.sucesso = false;
                 } else {
                     retorno.sucesso_alt_blockchain = result.args.sucesso;
                     retorno.sucesso = true;
+
+                    blockchain_seguradoras[_user.seguradora].forcar_atualizacao = true;
                 }
 
-                sio.sockets.connected[_socketId].emit('ret_sendTr_incluir_apolice', JSON.stringify(retorno));
+                _socket.emit('ret_sendTr_incluir_apolice', JSON.stringify(retorno));
                 console.log('>>>>> event cosseguro.ret_incluir_apolice >> evento recebido do GETH e enviado para o client >> ponto 2');
             } else {
                 console.log('>>>>> event cosseguro.ret_incluir_apolice >> evento regeitado (err 1)');
@@ -356,6 +367,7 @@ cosseguro.ret_incluir_apolice(function(error, result){
 app.post('/consultar_apolice', urlencodedParser, function (req, res) {
     var retorno = {};
     retorno.msg = "";
+    retorno.loginError = false;
         
     res.writeHead(200, {"Content-Type": "application/json"});
     
@@ -365,7 +377,8 @@ app.post('/consultar_apolice', urlencodedParser, function (req, res) {
     if (!sessionValid(req.body.usuario, req)) {
         retorno.msg = "usuário inválido!";
         retorno.msgTecnica = "sessionValid -> req.body.usuario = " + req.body.usuario;
-        retorno.sucesso = "false"; 
+        retorno.sucesso = false; 
+        retorno.loginError = true;
         res.end(JSON.stringify(retorno));
         return;
     }
@@ -395,129 +408,152 @@ app.post('/consultar_apolice', urlencodedParser, function (req, res) {
 /////////////////////////////////////////////
 
 app.post('/cadastrar_acordo', urlencodedParser, function (req, res) {
-    var retorno = {};
-    retorno.funcao = "Inclus&atilde;o de operação";
+    var index_apolice = req.body.index_apolice;
+    var addr_seguradora_aceito = req.body.addr_seguradora_aceito;
+    var percent_acordo = req.body.percent_acordo;
     
-    var codigo_operacao = req.body.codigo_operacao;
-    var valor_operacao = req.body.valor_operacao;
-
+    var retorno = {};
+    retorno.funcao = "Cadastro de Seguradora";
     retorno.msg = "";
     retorno.msgTecnica = "";
     retorno.sucesso = true;
     retorno.txHash = "";
-    retorno.retornoApresentado = "";
-    retorno.sucesso_alt_blockchain = "";
+    retorno.retornoApresentado = false;
+    retorno.sucesso_alt_blockchain = false;
     retorno.mensagem_blockchain = "";
-    retorno.dados_operacao = {};
-    retorno.dados_operacao.codigo_operacao = codigo_operacao;
-    retorno.dados_operacao.valor_operacao = valor_operacao;
-
-    res.writeHead(200, {"Content-Type": "application/json"});
+    retorno.acordo = {};
+    retorno.acordo.index_apolice = index_apolice;
+    retorno.acordo.addr_seguradora_aceito = addr_seguradora_aceito;
+    retorno.acordo.percent_acordo = percent_acordo;
+    retorno.loginError = false;
+    
+    res.writeHead("200", {"Content-Type": "application/json"});
     
     if (!sessionValid(req.body.usuario, req)) {
         retorno.msg = "usuário inválido!";
-        retorno.msgTecnica = "/cadastrar_operacao >> sessionValid -> req.body.usuario = " + req.body.usuario;
+        retorno.msgTecnica = "/cadastrar_acordo >> sessionValid -> req.body.usuario = " + req.body.usuario;
         console.log(">>>>> " + retorno.msgTecnica);
-        res.end(retorno);
-        return;
+        retorno.loginError = true;
+        res.end(JSON.stringify(retorno));
+        return false;
     }
 
-    if (!validacao_simples(codigo_operacao)) {
-        retorno.msg += "Código da opração: inválido\n";
+    if (index_apolice < 0) {
+        retorno.msg += "Apólice: inválido\n";
         retorno.sucesso = false;
     }
     
-    if (!validacao_simples(valor_operacao)) {
-        retorno.msg += "Valor: inválido\n";
+    if (!validacao_simples(addr_seguradora_aceito)) {
+        retorno.msg += "Address da Seguradora: inválida\n";
         retorno.sucesso = false;
     }
     
+    if (!validacao_simples(percent_acordo)) {
+        retorno.msg += "Percentual: inválido\n";
+        retorno.sucesso = false;
+    }
+        
     if (!retorno.sucesso) {
         retorno.msg = "Verifique o(s) erro(s) abaixo:\n" + retorno.msg;
         res.end(JSON.stringify(retorno));
-        console.log(">>>> cadastrar_operacao >> ponto 1.5 >> retorno.msg = " + retorno.msg);
+        console.log(">>>> cadastrar_acordo >> ponto 1.5 >> retorno.msg = " + retorno.msg);
         return;
     }
 
-    console.log(">>>> cadastrar_operacao >> ponto 2");
-
-    valor_operacao = formata_valor_subida(valor_operacao);
+    console.log(">>>> cadastrar_acordo >> ponto 2");
     
-    cosseguro.incluir_operacao.sendTransaction(codigo_operacao, parseInt(valor_operacao), {
+    //incluir_acordo(uint _index_apolice, uint16 _percent_acordo, address _addr_seguradora_aceito)
+    cosseguro.incluir_acordo.sendTransaction(index_apolice, parseInt(percent_acordo), addr_seguradora_aceito, {
 		from: web3_node1.eth.coinbase, gas: 3500000 }, function(err, txHash) {
             if (err != null) {
-                retorno.msg = "Erro ao tentar incluir uma operação";
-                retorno.msgTecnica = "cosseguro.incluir_operacao.sendTransaction => " + err;
-                console.log(">>>> cadastrar_operacao >> retorno.msgTecnica: " + retorno.msgTecnica);
+                retorno.msg = "Erro ao tentar incluir uma seguradora";
+                retorno.msgTecnica = "cosseguro.incluir_acordo.sendTransaction => " + err;
                 retorno.sucesso = false;
                 retorno.txHash = txHash;
-                retorno.retornoApresentado = "false";
+                retorno.retornoApresentado = false;
                 retorno.sucesso_alt_blockchain = "";
                 retorno.mensagem_blockchain = "";
-                retorno.dados_operacao = {};
-                retorno.dados_operacao.codigo_operacao = codigo_operacao;
-                retorno.dados_operacao.valor_operacao = valor_operacao;
-                
+                retorno.acordo = {};
+                retorno.acordo.index_apolice = index_apolice;
+                retorno.acordo.addr_seguradora_aceito = addr_seguradora_aceito;
+                retorno.acordo.percent_acordo = percent_acordo;
+
                 res.end(JSON.stringify(retorno));
             } else {
-                retorno.msg = "Em andamento a minera&ccedil;&atilde;o da nova operação";
-                console.log(">>>> cadastrar_operacao >> retorno.msg: " + retorno.msg);
+                retorno.msg = "Em andamento a minera&ccedil;&atilde;o da inclusão da seguradora na apolice";
+                console.log(">>>> cadastrar_acordo >> retorno.msg: " + retorno.msg);
                 retorno.sucesso = true;
                 retorno.txHash = txHash;
-                retorno.retornoApresentado = "false";
+                retorno.retornoApresentado = false;
                 retorno.sucesso_alt_blockchain = "";
+                retorno.sucesso = true;
                 retorno.mensagem_blockchain = "";
-                retorno.dados_operacao = {};
-                retorno.dados_operacao.codigo_operacao = codigo_operacao;
-                retorno.dados_operacao.valor_operacao = valor_operacao;
-                
-                txHashs[txHash] = users[req.sessionID].socketId; //utilizado para que o eventoi possa dar o retorno para o client correto.
-                //console.log('>>>>> app.post >> /cadastrar_operacao >> req.sessionID = ' + req.sessionID);
-                //console.log('>>>>> app.post >> /cadastrar_operacao >> users[req.sessionID].socketId = ' + users[req.sessionID].socketId);
-                //console.log('>>>>> app.post >> /cadastrar_operacao >> txHashs[txHash] = ' + txHashs[txHash]);
+                retorno.acordo = {};
+                retorno.acordo.index_apolice = index_apolice;
+                retorno.acordo.addr_seguradora_aceito = addr_seguradora_aceito;
+                retorno.acordo.percent_acordo = percent_acordo;
 
+                txHashs[txHash] = req.sessionID; //utilizado para que o evento possa dar o retorno para o client correto.
+                
                 res.end(JSON.stringify(retorno));
             }
         }
     );
 
-    sio.sockets.connected[users[req.sessionID].socketId].emit('notification', retorno);
-    console.log('>>>>> app.post >> /cadastrar_operacao');
+    //sio.sockets.connected[users[req.sessionID].socketId].emit('notification', mensagem);
+    console.log('>>>>> app.post >> /cadastrar_acordo');
 });
 
 //event ret_incluir_acordo(uint index_apolice, uint64 percent_acordo, address addr_seguradora_aceito, uint index_array_acordo, bool sucesso, int cod_retorno, string descricao);
 cosseguro.ret_incluir_acordo(function(error, result){
-    console.log('>>>>> event cosseguro.ret_alterar_duplicata >> evento recebido do GETH e enviado para o client >> ponto 1');
-    var retorno = {};
-    
-    retorno.msg = "";
-    retorno.txHash = result.transactionHash;
-    console.log('>>>>> event cosseguro.ret_alterar_duplicata >> ponto 2 >> result.transactionHash = ' + result.transactionHash);
-    console.log('>>>>> event cosseguro.ret_alterar_duplicata >> ponto 3 >> txHashs[result.transactionHash] = ' + txHashs[result.transactionHash]);
-    retorno.retornoApresentado = false;
-    retorno.funcao = "Inclus&atilde;o de operação";
-    retorno.mensagem_blockchain = result.args.descricao;
-    retorno.cod_erro = result.args.cod_erro;
-    retorno.dados_duplicata = {};
-    retorno.dados_duplicata.chave = result.args.chave;
-    retorno.dados_duplicata.codigo_op = result.args.codigo_op;
-    retorno.dados_duplicata.index_alocacao = result.args.index_alocacao;
-    retorno.dados_duplicata.cpf_cnpj_sacado = result.args.cpf_cnpj_sacado;
-    retorno.dados_duplicata.cnpj_emissor = result.args.cnpj_emissor;
-    retorno.dados_duplicata.valor_duplicata = result.args.valor;
-    retorno.dados_duplicata.situacao_nova_duplicata = result.args.situacao;
-    
-    if (error != null) {
-        retorno.msgTecnica = "Codigo do erro: " + result.args.cod_erro + '\n descricao: ' + result.args.descricao;
-        retorno.sucesso_alt_blockchain = false;
-    
-    } else {
-        var cod_erro = parseInt(result.args.cod_erro);
-        retorno.sucesso_alt_blockchain = ((cod_erro < 0) ? true : false);
-    }
+    var _sessionID = txHashs[result.transactionHash]; 
+    if (typeof _sessionID !== 'undefined' && _sessionID) {
+        var _user = users[_sessionID]; 
+        if (typeof _user !== 'undefined' && _user) {
+            var _socketId = _user.socketId;
+            var _socket = sio.sockets.connected[_socketId]; 
+            if (typeof _socket !== 'undefined' && _socket) {
+                console.log('>>>>> event cosseguro.ret_incluir_acordo >> evento recebido do GETH e enviado para o client >> ponto 1');
+                var retorno = {};
+                
+                retorno.msg = "";
+                retorno.txHash = result.transactionHash;
+                console.log('>>>>> event cosseguro.ret_incluir_acordo >> ponto 2 >> result.transactionHash = ' + result.transactionHash);
+                console.log('>>>>> event cosseguro.ret_incluir_acordo >> ponto 3 >> txHashs[result.transactionHash] = ' + txHashs[result.transactionHash]);
+                retorno.retornoApresentado = false;
+                retorno.sucesso = false;
+                retorno.funcao = "Cadastro de apolice";
+                retorno.mensagem_blockchain = result.args.descricao;
+                retorno.cod_retorno = result.args.cod_retorno;
+                retorno.acordo = {};
+                retorno.acordo.index_apolice = result.args.index_apolice;
+                retorno.acordo.addr_seguradora_aceito = result.args.addr_seguradora_aceito;
+                retorno.acordo.percent_acordo = result.args.percent_acordo;
+                
+                var cod_retorno = parseInt(result.args.cod_retorno.toString());
 
-    sio.sockets.connected[txHashs[result.transactionHash]].emit('retorno_sendTransaction', JSON.stringify(retorno));
-    console.log('>>>>> event cosseguro.ret_alterar_duplicata >> evento recebido do GETH e enviado para o client >> ponto 2');
+                if (error != null || cod_retorno < 0) {
+                    retorno.msgTecnica = "Codigo do erro: " + cod_retorno + '\n descricao: ' + result.args.descricao;
+                    retorno.sucesso_alt_blockchain = false;
+                    retorno.sucesso = false;
+                } else {
+                    retorno.sucesso_alt_blockchain = result.args.sucesso;
+                    retorno.sucesso = true;
+                    
+                    blockchain_seguradoras[_user.seguradora].forcar_atualizacao = true;
+                }
+
+                sio.sockets.connected[_socketId].emit('ret_sendTr_incluir_acordo', JSON.stringify(retorno));
+                console.log('>>>>> event cosseguro.ret_incluir_acordo >> evento recebido do GETH e enviado para o client >> ponto 2');
+            } else {
+                console.log('>>>>> event cosseguro.ret_incluir_acordo >> evento regeitado (err 1)');
+            }
+        } else {
+            console.log('>>>>> event cosseguro.ret_incluir_acordo >> evento regeitado (err 2)');
+        }
+    } else {
+        console.log('>>>>> event cosseguro.ret_incluir_acordo >> evento regeitado (err 3)');
+    }
 });
 
 app.post('/autorizar_acordo', urlencodedParser, function (req, res) {
@@ -544,6 +580,7 @@ app.post('/autorizar_acordo', urlencodedParser, function (req, res) {
     retorno.dados_duplicata.cnpj_emissor = cnpj_emissor;
     retorno.dados_duplicata.valor_duplicata = valor_duplicata;
     retorno.dados_duplicata.situacao_nova_duplicata = situacao_nova_duplicata;
+    retorno.loginError = false;
     
     res.writeHead("200", {"Content-Type": "application/json"});
     
@@ -551,6 +588,7 @@ app.post('/autorizar_acordo', urlencodedParser, function (req, res) {
         retorno.msg = "usuário inválido!";
         retorno.msgTecnica = "/cadastrar_duplicata >> sessionValid -> req.body.usuario = " + req.body.usuario;
         console.log(">>>>> " + retorno.msgTecnica);
+        retorno.loginError = true;
         res.end(retorno);
         return false;
     }
@@ -690,6 +728,7 @@ app.post('/consultar_blockchain', urlencodedParser, function (req, res) {
     var retorno = {};
     retorno.msg = "";
     retorno.sucesso = true;
+    retorno.loginError = false;
     retorno.blockchain = {};
     //retorno.blockchain.apolices = {};
     //retorno.blockchain.apolices[0].acordos = {};
@@ -702,6 +741,7 @@ app.post('/consultar_blockchain', urlencodedParser, function (req, res) {
         retorno.msg = "usuário inválido!";
         retorno.msgTecnica = "sessionValid -> req.body.usuario = " + req.body.usuario;
         retorno.sucesso = false; 
+        retorno.loginError = true;
         res.end(JSON.stringify(retorno));
         console.log('>>>>> app.post >> /consultar_blockchain >> ponto 1.5 >> retorno.msgTecnica = ' + retorno.msgTecnica);
         return;
@@ -717,7 +757,9 @@ app.post('/consultar_blockchain', urlencodedParser, function (req, res) {
 
     console.log('>>>>> app.post >> /consultar_blockchain >> ponto 2');
 
-    var total_apolices = cosseguro.contar_apolices();
+    var total_apolices = 0;
+    total_apolices = parseInt(cosseguro.contar_apolices().toString());
+    
     var arr_apolices = [];
     for (var iA = 0; iA < total_apolices; iA++) {
         arr_apolices[iA] = cosseguro.consultar_apolice(iA);
@@ -747,6 +789,7 @@ app.post('/consultar_blockchain', urlencodedParser, function (req, res) {
 
 		json_aux += virgula_apolice;
 		json_aux += '{';
+		json_aux += '"index_apolice":"' + iApolices + '",';
 		json_aux += '"codigo_apolice":"' + codigo_op_aux + '",';
 		json_aux += '"valor_premio":"' + valor_premio + '",';
 		json_aux += '"valor_cobertura":"' + valor_cobertura + '",';
@@ -770,6 +813,7 @@ app.post('/consultar_blockchain', urlencodedParser, function (req, res) {
 
             json_aux += virgula_acordo;
             json_aux += '{';
+            json_aux += '"index_seguradora":"' + iSeguradoras + '",';
             json_aux += '"addr_seguradora":"' + addr_seguradora + '",';
             json_aux += '"percent":"' + percent + '",';
             json_aux += '"autorizado":"' + autorizado + '"';

@@ -8,7 +8,7 @@ var arrEventosRecebidos_codRetorno = []; //guarda os eventos recebidos
 var arrEventosRecebidos_obj_tipo = []; //guarda os eventos recebidos
 var exibicao_em_andamento = false;
 var arrEventosRecebidos_l = 0;
-var block_pend_atualizacao = true;
+//var block_pend_atualizacao = true;
 var blockchain;
 var codigo_informado = false;
 var cosseguroABI_o;
@@ -208,7 +208,7 @@ function atualizar_exibicao_lista_tx() {
 			}
 		}
 
-		controle_html = controle_html + '<div href="#" id="tx_pendente" index_tx="' + t + '" hash_tx="' + arr_aux[0] + '" class="ui-btn ui-corner-all ui-shadow ui-mini" style="width:85%; height:40px; margin:10px auto;"><div style="display:table; width:100%"><div style="display:table-cell; position:relative; width:85%; height:40px; vertical-align:middle;"><div style="width:100%; text-align:left; word-wrap:break-word; white-space:normal;">' + arr_aux[2] +'</div><div style="width:100%; text-align:left; word-wrap:break-word; white-space:normal; font-size:0.7em;">' + arr_aux[5] + '</div></div><div style="display:table-cell; position:relative; width:15%; height:40px; top:0px; text-align:center; vertical-align: middle;"> + situacao + </div></div></div></div>';
+		controle_html = controle_html + '<div href="#" id="tx_pendente" index_tx="' + t + '" hash_tx="' + arr_aux[0] + '" class="ui-btn ui-corner-all ui-shadow ui-mini" style="width:85%; height:40px; margin:10px auto;"><div style="display:table; width:100%"><div style="display:table-cell; position:relative; width:85%; height:40px; vertical-align:middle;"><div style="width:100%; text-align:left; word-wrap:break-word; white-space:normal;">' + arr_aux[2] +'</div><div style="width:100%; text-align:left; word-wrap:break-word; white-space:normal; font-size:0.7em;">' + arr_aux[5] + '</div></div><div style="display:table-cell; position:relative; width:15%; height:40px; top:0px; text-align:center; vertical-align: middle;">' + situacao_exibicao + '</div></div></div></div>';
 	}
 	if (controle_html.length == 0) {
 		controle_html = "<p>N&atilde;o foram enviadas transa&ccedil;&otilde;es para minera&ccedil;&atilde;o</p>"
@@ -278,7 +278,7 @@ function exibir_mensagem(tipo) {
 				setTimeout(function() {
 					$(".mensagem_sucesso").fadeToggle( "slow" );
 					exibicao_em_andamento = false;
-					block_pend_atualizacao = true;
+					//block_pend_atualizacao = true;
 				}, 4000);
 			});
 		} else {
@@ -309,7 +309,7 @@ function registrarEvento(funcao, tx, sucesso, tipo, codRetorno) {
 	arrEventosRecebidos_l++;
 
 	if (tipo != "alerta") {
-		block_pend_atualizacao = true;
+		//block_pend_atualizacao = true;
 
 		mensagem_resposta = funcao + ": Minerada com sucesso.";
 
@@ -515,12 +515,12 @@ function atualizar_links_acordo() {
 // inicio apolices
 /*
 function incluir_apolice_lista_apolices(codigo_apolice) {
-	var html_aux = listarapolices(0, codigo_apolice);
+	var html_aux = listarapolices(0, codigo_apolice, false);
 	//$("#inncluir_apolice_lista_apolices").html(html_aux);
 }
 */
 
-function listarapolices(quantidade, query_apolice) {
+function listarapolices(quantidade, query_apolice, retornar_index) {
 	// se "quantidade" == 0 mostra todos
 	// se "quantidade" != 0 mostra os últimos conforme valor informado
 
@@ -551,6 +551,7 @@ function listarapolices(quantidade, query_apolice) {
 
 	for (var iApolices=total_loops_apolice; iApolices > 0; iApolices--)
 	{
+		index_apolice = blockchain.apolices[iApolices-1].index_apolice;
 		codigo_apolice = blockchain.apolices[iApolices-1].codigo_apolice;
 		valor_premio = blockchain.apolices[iApolices-1].valor_premio;
 		valor_cobertura = blockchain.apolices[iApolices-1].valor_cobertura;
@@ -559,6 +560,9 @@ function listarapolices(quantidade, query_apolice) {
 		if (pesquisa_ativada_apolice) {
 			if (codigo_apolice.toLowerCase().indexOf(query_apolice.toLowerCase()) >= 0) {
 				exibir = true;
+				if (retornar_index && codigo_apolice.toLowerCase() == query_apolice.toLowerCase()) {
+					return iApolices-1;
+				}
 			} else {
 				exibir = false;
 			}
@@ -592,7 +596,11 @@ function listarapolices(quantidade, query_apolice) {
 		apolices_html = apolices_html + "<br /><table class=\"lista\"><tr><td style=\"border: none;\">N&atilde;o h&aacute; apolices cadastradas.</td></tr></table>";
 	}
 
-	return apolices_html.replace(/[^\x20-\x7E]+/g, '');
+	if (retornar_index) {
+		return -1;
+	} else {
+		return apolices_html.replace(/[^\x20-\x7E]+/g, '');
+	}
 }
 
 function sub_menu_apolice_alterar_limpar() {
@@ -608,7 +616,7 @@ function atualizar_links_apolice_pesq() {
 		query_codigo_apolice = $("#codigo_apolice_pesquisa").val().toString().trim();
 
 		/*if (query_codigo_apolice.length >= 3) {*/
-			html_lista_apolices = listarapolices(0, query_codigo_apolice);
+			html_lista_apolices = listarapolices(0, query_codigo_apolice, false);
 			$("#consultar_apolice").html(html_lista_apolices);
 
 			atualizar_links_apolice();
@@ -635,6 +643,43 @@ function sub_menu_apolice_incluir_limpar() {
 	$("#cad_apolice_dt_vencimento").css('border', 'none');
 
 	$( "#cad_apolice_dt_vencimento" ).date("refresh");
+
+	$("#controle_sobra").hide();
+	$("#controle_falta").hide();
+	$("#sub-menu-grupo-controle").hide();
+	$("#controle_lista_eventos").hide();
+	$("#sub-menu-grupo-acordo").hide();
+	$("#sub-menu-grupo-apolice").show();
+	$("#master-container").hide();
+	$("#incluir_acordo").hide();
+	$("#alterar_acordo").hide();
+	$("#consultar_acordo").hide();
+	$("#incluir_apolice").hide();
+	$("#alterar_apolice").hide();
+	$("#consultar_apolice").hide();
+	$("#detalhar_apolice").hide();
+}
+
+function sub_menu_apolice_incluir_acordo_limpar() {
+	$("#cad_acordo_address_seguradora_aceito").val("");
+	$("#cad_acordo_address_seguradora_aceito").css('border', 'none');
+	$("#cad_acordo_percentual").val("");
+	$("#cad_acordo_percentual").css('border', 'none');
+
+	$("#controle_sobra").hide();
+	$("#controle_falta").hide();
+	$("#sub-menu-grupo-controle").hide();
+	$("#controle_lista_eventos").hide();
+	$("#sub-menu-grupo-acordo").hide();
+	$("#sub-menu-grupo-apolice").show();
+	$("#master-container").hide();
+	$("#incluir_acordo").hide();
+	$("#alterar_acordo").hide();
+	$("#consultar_acordo").hide();
+	$("#incluir_apolice").hide();
+	$("#alterar_apolice").hide();
+	$("#consultar_apolice").hide();
+	$("#detalhar_apolice").hide();
 }
 
 function atualizar_links_apolice() {
@@ -952,12 +997,12 @@ function inicializar_contrato() {
 			atualizar_links_acordo_pesq();
 		};
 
-		if (!block_pend_atualizacao) {
+		//if (!block_pend_atualizacao) {
 			em_espera_execucao();
 			em_espera_execucao = function () {};
-		} else {
-			atualiza_cache_blockchain();
-		}
+		//} else {
+		//	atualiza_cache_blockchain();
+		//}
 
 		$("#controle_sobra").hide();
 		$("#controle_falta").hide();
@@ -1077,18 +1122,18 @@ function inicializar_contrato() {
 		$("#consultar_apolice").html("");
 
 		em_espera_execucao = function() {
-			html_lista_apolice = listarapolices(0, "");
+			html_lista_apolice = listarapolices(0, "", false);
 			$("#consultar_apolice").html(html_lista_apolice);
 			atualizar_links_apolice();
 			atualizar_links_apolice_pesq();
 		};
 
-		if (!block_pend_atualizacao) {
+		//if (!block_pend_atualizacao) {
 			em_espera_execucao();
 			em_espera_execucao = function () {};
-		} else {
-			atualiza_cache_blockchain();
-		}
+		//} else {
+		//	atualiza_cache_blockchain();
+		//}
 
 		$("#controle_sobra").hide();
 		$("#controle_falta").hide();
@@ -1115,12 +1160,12 @@ function inicializar_contrato() {
 			preenchimento_DEBUG();
 		};
 
-		if (!block_pend_atualizacao) {
+		//if (!block_pend_atualizacao) {
 			em_espera_execucao();
 			em_espera_execucao = function () {};
-		} else {
-			atualiza_cache_blockchain();
-		}
+		//} else {
+		//	atualiza_cache_blockchain();
+		//}
 		
 		$("#controle_sobra").hide();
 		$("#controle_falta").hide();
@@ -1231,23 +1276,78 @@ function inicializar_contrato() {
 					arrTransacoes.push(data.txHash + "|false|" + data.funcao + "|||" + codigo_apolice);
 					alert("Em andamento a minera&ccedil;&atilde;o da nova apolice");
 				} else {
-					alert(data.msg);
+					if (data.loginError)
+						location.reload();
+					else
+						alert(data.msg);
 				}
 			}, function(errMsg) {
 				alert(errMsg);
 			});
-		/*
-		cosseguro.incluir_apolice.sendTransaction(codigo_apolice, valor_premio, valor_cobertura, valor_apolice, dt_vencimento, {
-		from: web3.eth.coinbase, gas: config[3].GAS }, function(err, txHash) {
-				if (err != null) {
-					//alert("Erro: " + err.message);
+	});
+	
+	$( "#btn_apolice__incluir_acordo" ).click(function() {
+		$("#cad_acordo_codigo_apolice").html($("#det_apolice_codigo").html());
+		
+		$("#controle_sobra").hide();
+		$("#controle_falta").hide();
+		$("#sub-menu-grupo-controle").hide();
+		$("#controle_lista_eventos").hide();
+		$("#sub-menu-grupo-acordo").hide();
+		$("#sub-menu-grupo-apolice").show();
+		$("#master-container").show();
+		$("#incluir_acordo").show();
+		$("#alterar_acordo").hide();
+		$("#consultar_acordo").hide();
+		$("#incluir_apolice").hide();
+		$("#alterar_apolice").hide();
+		$("#consultar_apolice").hide();
+		$("#detalhar_apolice").hide();
+	});
+
+	$( "#btn_apolice__incluir_acordo__enviar" ).click(function() {
+		var index_apolice = listarapolices(0, $("#cad_acordo_codigo_apolice").html(), true);
+		if (index_apolice == -1) {
+			alert("Erro: Inicie o cadastramento novamente");
+			sub_menu_apolice_incluir_acordo_limpar();
+			return;
+		}
+		
+		var addr_seguradora_aceito = $("#cad_acordo_address_seguradora_aceito").val().toString();
+		if (!validacao_simples($("#cad_acordo_address_seguradora_aceito"), "cad_acordo_address_seguradora_aceito é inválido"))
+			return;
+		
+		var percent_acordo = $("#cad_acordo_percentual").val().toString();
+		if (!validacao_simples($("#cad_acordo_percentual"), "cad_acordo_percentual é inválido"))
+			return;
+		
+		preenchimento_DEBUG();
+		sub_menu_apolice_incluir_acordo_limpar();
+
+		var _data = {};
+		_data.index_apolice = index_apolice;
+		_data.addr_seguradora_aceito = addr_seguradora_aceito;
+		_data.percent_acordo = parseInt(formata_valor_subida(percent_acordo));
+		_data.usuario = usuario;
+		
+		//alert(_data + '\n' + this.id);
+		//incluir_acordo(uint _index_apolice, uint16 _percent_acordo, address _addr_seguradora_aceito)
+		postAjax("/cadastrar_acordo", 
+			_data, 
+			function(data) {
+				//$("#retorno_login").html(data);
+				if (data.sucesso) {
+					arrTransacoes.push(data.txHash + "|false|" + data.funcao + "|||" + codigo_apolice);
+					alert("Em andamento a minera&ccedil;&atilde;o da inclusão da seguradora na apolice");
 				} else {
-					arrTransacoes.push(txHash + "|false|Inclus&atilde;o de apolice|||" + codigo_apolice);
-					alert("Em andamento a minera&ccedil;&atilde;o da nova apolice");
+					if (data.loginError)
+						location.reload();
+					else
+						alert(data.msg);
 				}
-			}
-		);
-		*/
+			}, function(errMsg) {
+				alert(errMsg);
+			});
 	});
 
 	$( "#alterar_apolice_btn" ).click(function() {
@@ -1302,54 +1402,27 @@ function inicializar_contrato() {
 
 	socket.on('ret_sendTr_incluir_apolice', function (data_str) {
 		var data = JSON.parse(data_str);
-		registrarEvento(data.funcao, data.txHash, data.sucesso, "", data.cod_retorno);
-	});
-	/*
-    //event ret_incluir_apolice(uint128 chave, uint cnpj_emissor, uint cpf_cnpj_sacado, uint64 valor, uint8 situacao, string codigo_apolice, uint index_alocacao, int cod_erro, string descricao);
-    cosseguro.ret_incluir_apolice(function(error, result){
-		if (error != null) {
-			registrarEvento("Inclus&atilde;o de Duplicata", result.transactionHash, false, result, error, "", 0);
-		} else {
-			var cod_erro = parseInt(result.args.cod_erro);
-			registrarEvento("Inclus&atilde;o de Duplicata", result.transactionHash, ((cod_erro < 0) ? true : false), result, error, "", cod_erro);
-		}
-	});
-    //event ret_alterar_apolice(uint chave, uint cnpj_emissor, uint cpf_cnpj_sacado, uint64 valor, uint8 situacao, int cod_erro, string descricao);
-    cosseguro.ret_alterar_apolice(function(error, result){
-		if (error != null) {
-			registrarEvento("Altera&ccedil;&atilde;o de Duplicata", result.transactionHash, false, result, error, "", 0);
-		} else {
-			var cod_erro = parseInt(result.args.cod_erro);
-			registrarEvento("Altera&ccedil;&atilde;o de Duplicata", result.transactionHash, ((cod_erro < 0) ? true : false), result, error, "", cod_erro);
-		}
+		
+		if (data.loginError)
+			location.reload();
+		else
+			registrarEvento(data.funcao, data.txHash, data.sucesso, "", data.cod_retorno);
 	});
 
-	//event ret_incluir_acordo(string codigo_apolice, uint64 valor, int cod_erro, string descricao);
-    cosseguro.ret_incluir_acordo(function(error, result){
-		if (error != null) {
-			registrarEvento("Inclus&atilde;o de Opera&ccedil;&atilde;o", result.transactionHash, false, result, error, "", 0);
-		} else {
-			var cod_erro = parseInt(result.args.cod_erro);
-			registrarEvento("Inclus&atilde;o de Opera&ccedil;&atilde;o", result.transactionHash, ((cod_erro < 0) ? true : false), result, error, "", cod_erro);
-		}
+	socket.on('ret_sendTr_incluir_acordo', function (data_str) {
+		var data = JSON.parse(data_str);
+		
+		if (data.loginError)
+			location.reload();
+		else
+			registrarEvento(data.funcao, data.txHash, data.sucesso, "", data.cod_retorno);
 	});
-
-	//event ret_alterar_acordo(string codigo_apolice, uint64 valor_atualizado, int cod_erro, string descricao);
-    cosseguro.ret_alterar_acordo(function(error, result){
-		if (error != null) {
-			registrarEvento("Altera&ccedil;&atilde;o de Opera&ccedil;&atilde;o", result.transactionHash, false, result, error, "", 0);
-		} else {
-			var cod_erro = parseInt(result.args.cod_erro);
-			registrarEvento("Altera&ccedil;&atilde;o de Opera&ccedil;&atilde;o", result.transactionHash, ((cod_erro < 0) ? true : false), result, error, "", cod_erro);
-		}
-	});
-	*/
 
 	atualiza_cache_blockchain();
 
 	//sleep(10);
 
-	//$.mobile.loading( 'hide' );
+	$.mobile.loading( 'hide' );
 
 	$("#page-app").show();
 }
@@ -1404,7 +1477,8 @@ function formata_valor_subida(valor) {
 
 	valor_aux = valor_aux.replace(".","").replace(",","");
 
-	return parseInt(valor_aux);
+	//return parseInt(valor_aux);
+	return parseInt(valor);
 }
 
 function formata_numero_subida(valor) {
@@ -1459,8 +1533,8 @@ function validacao_simples(obj, mensagem) {
 }
 
 function atualiza_cache_blockchain() {
-	if (!block_pend_atualizacao)
-		return;
+	//if (!block_pend_atualizacao)
+	//	return;
 
 	$("body").addClass("loading");
 	$.mobile.loading( 'show' );
@@ -1474,6 +1548,9 @@ function atualiza_cache_blockchain() {
 			if (data.sucesso) {
 				atualiza_cache_blockchain_aux(data.blockchain)
 			} else {
+				if (data.loginError)
+					location.reload();
+
 				retiraLoding();
 				alert("Erro de atualização do cache. Mensagem: " + data.msg + "<br>Mensagem Téc.: " + data.msgTecnica);
 			}
@@ -1488,11 +1565,11 @@ function atualiza_cache_blockchain() {
 function atualiza_cache_blockchain_aux(_blockchain) {
 	//sleep(20);
 
-	if (!block_pend_atualizacao)
-		return;
+	//if (!block_pend_atualizacao)
+	//	return;
 
 	blockchain = _blockchain;
-	block_pend_atualizacao = false;
+	//block_pend_atualizacao = false;
 
 	retiraLoding();
 }

@@ -2,20 +2,18 @@
 <div id="incluir_acordo" style="display:none;">
     <b class="title">Inclus&atilde;o de Acordo</b>
     <table>
-        <tr><td>C&oacute;digo da Apólice:</td><td><input id="cad_acordo_codigo_apolice" maxlength="25" /></td></tr>
+        <tr><td>C&oacute;digo da Apólice:</td><td><span id="cad_acordo_codigo_apolice"></span></td></tr>
     </table>
-    <div data-role="collapsible" data-mini="true" id="dados_acordo">
+    <!--div data-role="collapsible" data-mini="true" id="dados_acordo"-->
         <h4>Dados da Acordo</h4>
         <table>
-            <tr><td>Seguradora (Address ethereum):</td><td><input id="cad_acordo_address_seguradora_aceito" /></td></tr>
-            <tr><td>Percentual:</td><td><input id="cad_acordo_percentual" maxlength="16" /></td></tr>
+            <tr><td>Seguradora (Address ethereum):</td><td><input id="cad_acordo_address_seguradora_aceito" value="0x3c513bb978ab6c4ae7c5f25b61a839332842410d" /></td></tr>
+            <tr><td>Percentual (%):</td><td><input id="cad_acordo_percentual" maxlength="3" value="20" /></td></tr>
         </table>
-    </div>
+    <!--/div-->
     
     <input type="hidden" id="cad_acordo_index_apolice" />
-    <button id="incluir_acordo_btn">Incluir Acordo</button>
-
-    <div id="incluir_acordo_lista_acordos"></div>
+    <button id="btn_apolice__incluir_acordo__enviar">Incluir Acordo</button>
 </div>
 
 <div id="consultar_acordo" style="display:none;"></div>

@@ -132,9 +132,7 @@
                 _data, 
                 function(data) {
                     //$("#retorno_login").html(data);
-                    if (data.sucesso) {
-                        location.reload();
-                    }
+                    location.reload();
                 }, function(errMsg) {
                     alert(errMsg);
                 });
