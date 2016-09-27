@@ -22,7 +22,31 @@ if(1==1) {
 
         var diasParaVencimento = 40;
 		// passando um parametro de entrada
-		obj_funcao.sendTransaction("codigo da apolice2", 33333, 4444444, Date.now() + diasParaVencimento * 24 * 60 * 60,
+		/*
+		function incluir_apolice(
+			string _codigo_apolice, 
+			uint64 _premio_apolice, 
+			uint64 _cobertura_apolice, 
+			uint _dt_vencimento_apolice, 
+			address _seguradora1, 
+			uint16 _percent1, 
+			address _seguradora2, 
+			uint16 _percent2, 
+			address _seguradora3, 
+			uint16 _percent3
+			)
+		*/
+		obj_funcao.sendTransaction(
+			"cod 001", 
+			33333, 
+			4444444, 
+			Date.now() + diasParaVencimento * 24 * 60 * 60, 
+			"0x0b697fd49ad5e2a30dc1e970e8db1b9d0a1c25b4", 
+			10, 
+			"0x361f832d63bf0f756161bf744aa7a4eaad5c8328", 
+			20, 
+			"0x3f6b843f2b8b6ea4ec2c18aa8fae5a92bff02079", 
+			30,
 			{from: eth.accounts[0], gas: 3500000}, 
 			function (err, result) {
 				if (err) {

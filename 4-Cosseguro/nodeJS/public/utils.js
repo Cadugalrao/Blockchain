@@ -1256,6 +1256,32 @@ function inicializar_contrato() {
 		if (!validacao_simples($("#cad_apolice_dt_vencimento"), "cad_apolice_dt_vencimento informado é inválido"))
 			return;
 
+		var seg1 = formata_numero_subida($("#cad_apolice_seg1").val().toString());
+		if (!validacao_simples($("#cad_apolice_seg1"), "cad_apolice_seg1 é inválido"))
+			return;
+
+		var seg1_percet = formata_numero_subida($("#cad_apolice_seg1_percet").val().toString());
+		if (!validacao_simples($("#cad_apolice_seg1_percet"), "cad_apolice_seg1_percet é inválido"))
+			return;
+		
+		var seg2 = formata_numero_subida($("#cad_apolice_seg2").val().toString());
+		var seg2_percet = formata_numero_subida($("#cad_apolice_seg2_percet").val().toString());
+
+		if (seg2.trim().length > 0 || seg2_percet.trim().length > 0) {
+			if (seg2.trim().length == 0){
+				validacao_mensagem_formata_erro($("#cad_apolice_seg2"), "Seguradora 2 inválida");
+				return;
+			}
+			if (seg2.trim().length == 0) {
+				validacao_mensagem_formata_erro($("#cad_apolice_seg2"), "Percentual da Seguradora 2 inválido");
+				return;
+			}
+		}
+
+		
+		var seg3 = formata_numero_subida($("#cad_apolice_seg3").val().toString());
+		var seg3_percet = formata_numero_subida($("#cad_apolice_seg3_percet").val().toString());
+		
 		sub_menu_apolice_incluir_limpar();
 		
 		preenchimento_DEBUG();
@@ -1524,12 +1550,16 @@ function formata_valor_descida(valor, sem_ponto) {
 function validacao_simples(obj, mensagem) {
 	var dado = obj.val();
 	if (dado.trim().length == 0 || dado.trim() == "0" || dado.trim() == "0,00") {
-		$("#codigo_apolice").css('border', '1px solid red');
-		alert(mensagem);
+		validacao_mensagem_formata_erro(obj, mensagem)
 		return false;
 	}
-	$("#codigo_apolice").css('border', 'none');
+	obj.css('border', 'none');
 	return true;
+}
+
+function validacao_mensagem_formata_erro(obj, mensagem) {
+	obj.css('border', '1px solid red');
+	alert(mensagem);
 }
 
 function atualiza_cache_blockchain() {

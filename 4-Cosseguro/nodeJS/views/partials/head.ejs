@@ -140,7 +140,10 @@
             event.preventDefault();
         });
 
-        if (usuario.length > 0)
+        if (usuario.length > 0) {
             main();
+        } else {
+            $("div.ui-loader").hide();
+        }
     });
 </script>
