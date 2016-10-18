@@ -23,11 +23,15 @@ if(1==1) {
         var diasParaVencimento = 40;
 		// passando um parametro de entrada
 		/*
-		function incluir_apolice(
+		incluir_apolice(
 			string _codigo_apolice, 
 			uint64 _premio_apolice, 
-			uint64 _cobertura_apolice, 
+			uint64 _valor_cobertura, 
 			uint _dt_vencimento_apolice, 
+			string _numero_aditivo, 
+			uint16 _tipo, 
+			uint16 _percent_comissao, 
+			uint16 _percent_desconto, 
 			address _seguradora1, 
 			uint16 _percent1, 
 			address _seguradora2, 
@@ -37,16 +41,20 @@ if(1==1) {
 			)
 		*/
 		obj_funcao.sendTransaction(
-			"cod 001", 
+			"cod 000", 
 			33333, 
 			4444444, 
-			Date.now() + diasParaVencimento * 24 * 60 * 60, 
-			"0x0b697fd49ad5e2a30dc1e970e8db1b9d0a1c25b4", 
-			10, 
+			Date.now() + diasParaVencimento * 24 * 60 * 60,
+			49584958495,
+			2,
+			39,
+			43,
 			"0x361f832d63bf0f756161bf744aa7a4eaad5c8328", 
-			20, 
-			"0x3f6b843f2b8b6ea4ec2c18aa8fae5a92bff02079", 
-			30,
+			10, 
+			"", 
+			0, 
+			"", 
+			0,
 			{from: eth.accounts[0], gas: 3500000}, 
 			function (err, result) {
 				if (err) {

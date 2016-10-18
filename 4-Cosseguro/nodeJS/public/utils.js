@@ -415,13 +415,13 @@ function listarAcordos(quantidade, query_filtro) {
 	}
 
 	var total_loops; // = 15;
-	total_loops = blockchain.Acordos.length;
+	total_loops = blockchain.acordos.length;
 
-	acordos_html = "<b class=\"title\">Listagem de Operações</b>";
+	acordos_html = "<b class=\"title\">Listagem de Acordos para aprovação</b>";
 	//acordos_html = acordos_html + "colocar filtro<br>";
 	//acordos_html = acordos_html + "diminuir a letra na tabela";
 	acordos_html = acordos_html + "<table>";
-	acordos_html = acordos_html + "<tr><td>C&oacute;digo</td><td><input id=\"codigo_acordo_pesquisa\" size=\"20\" value=\"" + query_filtro + "\" /></td><td><img class=\"icon_aux\" src=\"public/images/lupa.png\" alt=\"\" id=\"btn-pesquisar-acordo\" width=\"20\" height=\"20\" style=\"cursor: hand;\" /></td></tr>";
+	acordos_html = acordos_html + "<tr><td>Código da Apólice</td><td><input id=\"codigo_apolice_pesquisa\" size=\"20\" value=\"" + query_filtro + "\" /></td><td><img class=\"icon_aux\" src=\"public/images/lupa.png\" alt=\"\" id=\"btn-pesquisar-acordo\" width=\"20\" height=\"20\" style=\"cursor: hand;\" /></td></tr>";
 	acordos_html = acordos_html + "</table>";
 
 	if (total_loops < 10) {
@@ -431,9 +431,10 @@ function listarAcordos(quantidade, query_filtro) {
 	}
 
 	var valor_aux;
-	var acordos_html_conteudo = ""
+	var acordos_html_conteudo = "";
+	var codigo_apolice_aux;
 	for (var i=total_loops; i > 0; i--) {
-		var codigo_apolice_aux = blockchain.acordos[i - 1].codigo_apolice;
+		codigo_apolice_aux = blockchain.acordos[i - 1].codigo_apolice;
 
 		if (pesquisa_ativada) {
 			if (codigo_apolice_aux.toLowerCase().indexOf(query_filtro.toLowerCase()) >= 0) {
@@ -445,11 +446,12 @@ function listarAcordos(quantidade, query_filtro) {
 			exibir = true;
 		}
 
-		if (exibir) {
-			valor_atualizado_aux = formata_valor_descida(blockchain.acordos[i - 1].valor_atualizado, false);
+		acordo_autorizado = blockchain.acordos[i - 1].autorizado;
+		if (exibir && !acordo_autorizado) {
+			valor_cobertura_aux = formata_valor_descida(blockchain.acordos[i - 1].valor_cobertura, false);
 
 			index_acordo = i - 1;
-			acordos_html_conteudo = acordos_html_conteudo + '<div href="#" id="btn-alterar-acordo" index="' + index_acordo + '" class="ui-btn ui-corner-all ui-icon-carat-r ui-btn-icon-right ui-shadow ui-mini" style="width:85%; margin:10px auto;"><div style="display:inline-block; width:55%; text-align:left;">' + codigo_apolice_aux +'</div><div style="display:inline-block; width:5%; text-align:left;">R$</div><div style="display:inline-block; width:39%; padding-right:30px; text-align:right;">' + valor_atualizado_aux + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div></div>';
+			acordos_html_conteudo = acordos_html_conteudo + '<div href="#" id="btn-alterar-acordo" index="' + index_acordo + '" class="ui-btn ui-corner-all ui-icon-carat-r ui-btn-icon-right ui-shadow ui-mini" style="width:85%; margin:10px auto;"><div style="display:inline-block; width:55%; text-align:left;">' + codigo_apolice_aux +'</div><div style="display:inline-block; width:5%; text-align:left;">R$</div><div style="display:inline-block; width:39%; padding-right:30px; text-align:right;">' + valor_cobertura_aux + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div></div>';
 		}
 
 	}
@@ -458,9 +460,9 @@ function listarAcordos(quantidade, query_filtro) {
 	if (acordos_html_conteudo != "") {
 		acordos_html = acordos_html + acordos_html_conteudo;
 	} else if (pesquisa_ativada) {
-		acordos_html = acordos_html + "<br /><table class=\"lista\"><tr><td style=\"border: none;\">N&atilde;o foram encontradas opera&ccedil;&otilde;es com o c&oacute;digo informado: \"" + query_filtro + "\"</td></tr></table>";
+		acordos_html = acordos_html + "<br /><table class=\"lista\"><tr><td style=\"border: none;\">N&atilde;o foram encontrados apólices pendentes de autorização com o c&oacute;digo informado: \"" + query_filtro + "\"</td></tr></table>";
 	} else {
-		acordos_html = acordos_html + "<br /><table class=\"lista\"><tr><td style=\"border: none;\">N&atilde;o h&aacute; opera&ccedil;&otilde;es cadastradas.</td></tr></table>";
+		acordos_html = acordos_html + "<br /><table class=\"lista\"><tr><td style=\"border: none;\">N&atilde;o h&aacute; apólices pendentes de aprovação.</td></tr></table>";
 	}
 
 	return acordos_html.replace(/[^\x20-\x7E]+/g, '');
@@ -726,7 +728,7 @@ function atualizar_links_apolice() {
 			var percent = "";
 			var autorizado = "";
 
-			var total_loops_acordo = blockchain.apolices[index_apolice].acordos.length;
+			var total_loops_acordo = blockchain.apolices[index_apolice].seguradoras.length;
 
 			var acordo_html_conteudo = "";
 			for (var iAcordos=total_loops_acordo; iAcordos > 0; iAcordos--) {
@@ -1256,18 +1258,34 @@ function inicializar_contrato() {
 		if (!validacao_simples($("#cad_apolice_dt_vencimento"), "cad_apolice_dt_vencimento informado é inválido"))
 			return;
 
+		var numero_aditivo = $("#cad_apolice_numero_aditivo").val().toString();
+		if (!validacao_simples($("#cad_apolice_numero_aditivo"), "cad_apolice_numero_aditivo é inválido"))
+			return;
+		
+		var tipo = $("#cad_apolice_tipo").val().toString();
+		if (!validacao_simples($("#cad_apolice_tipo"), "cad_apolice_tipo é inválido"))
+			return;
+	
+		var persent_comisao = formata_numero_subida($("#cad_apolice_persent_comisao").val().toString());
+		if (!validacao_simples($("#cad_apolice_persent_comisao"), "cad_apolice_persent_comisao é inválido"))
+			return;
+		
+		var persent_desconto = formata_numero_subida($("#cad_apolice_persent_desconto").val().toString());
+		if (!validacao_simples($("#cad_apolice_persent_desconto"), "cad_apolice_persent_desconto é inválido"))
+			return;
+
 		var seg1 = formata_numero_subida($("#cad_apolice_seg1").val().toString());
 		if (!validacao_simples($("#cad_apolice_seg1"), "cad_apolice_seg1 é inválido"))
 			return;
 
-		var seg1_percet = formata_numero_subida($("#cad_apolice_seg1_percet").val().toString());
-		if (!validacao_simples($("#cad_apolice_seg1_percet"), "cad_apolice_seg1_percet é inválido"))
+		var seg1_percent = formata_numero_subida($("#cad_apolice_seg1_percent").val().toString());
+		if (!validacao_simples($("#cad_apolice_seg1_percent"), "cad_apolice_seg1_percent é inválido"))
 			return;
 		
 		var seg2 = formata_numero_subida($("#cad_apolice_seg2").val().toString());
-		var seg2_percet = formata_numero_subida($("#cad_apolice_seg2_percet").val().toString());
+		var seg2_percent = formata_numero_subida($("#cad_apolice_seg2_percent").val().toString());
 
-		if (seg2.trim().length > 0 || seg2_percet.trim().length > 0) {
+		if (seg2.trim().length > 0 || seg2_percent.trim().length > 0) {
 			if (seg2.trim().length == 0){
 				validacao_mensagem_formata_erro($("#cad_apolice_seg2"), "Seguradora 2 inválida");
 				return;
@@ -1280,7 +1298,7 @@ function inicializar_contrato() {
 
 		
 		var seg3 = formata_numero_subida($("#cad_apolice_seg3").val().toString());
-		var seg3_percet = formata_numero_subida($("#cad_apolice_seg3_percet").val().toString());
+		var seg3_percent = formata_numero_subida($("#cad_apolice_seg3_percent").val().toString());
 		
 		sub_menu_apolice_incluir_limpar();
 		
@@ -1291,10 +1309,22 @@ function inicializar_contrato() {
 		_data.valor_premio = parseInt(formata_valor_subida(valor_premio));
 		_data.valor_cobertura = parseInt(formata_valor_subida(valor_cobertura));
 		_data.dt_vencimento = dt_vencimento.getTime();
+		_data.numero_aditivo = numero_aditivo;
+		_data.tipo = parseInt(tipo);
+		_data.persent_comisao = parseInt(persent_comisao);
+		_data.persent_desconto = parseInt(persent_desconto);
+
+		_data.seg1_addr = parseInt(seg1);
+		_data.seg1_persent = parseInt(seg1_percent);
+		_data.seg2_addr = parseInt(seg2);
+		_data.seg2_persent = parseInt(seg2_percent);
+		_data.seg3_addr = parseInt(seg3);
+		_data.seg3_persent = parseInt(seg3_percent);
+		
 		_data.usuario = usuario;
 		
 		//alert(_data + '\n' + this.id);
-		postAjax("/cadastrar_apolice", 
+		postAjax("/incluir_apolice", 
 			_data, 
 			function(data) {
 				//$("#retorno_login").html(data);

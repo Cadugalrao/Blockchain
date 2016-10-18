@@ -16,53 +16,81 @@ contract Cosseguro {
     struct Apolice {
         string codigo;
         uint64 premio;
-        uint64 cobertura;
+        uint64 valor_cobertura;
         uint dt_vencimento;
+        uint numero_aditivo;
+        uint16 tipo;
+        uint16 percent_comissao;
+        uint16 percent_desconto;
+        int8 situacao_aprovacao; //quando for maior que 0 ainda há seguradoras que não aprovaram; quando for zero todas aceitaram; quando for negativo alguma cosseguradora não aceitou;
+        bool assinado_cliente;
         address owner;
         address[] addr_seguradora;
         uint16[] percent;
-        uint8[] autorizado; //0 = Sem resposta; 1 = Autorizado; 2 = Não autorizado;
+        uint8[] autorizado; //0 = Sem resposta; 1 = Autorizado; 2 = Rejeitado;
     }
     uint private _qtdeApolices;
 
-    event ret_incluir_apolice(string codigo_apolice, uint64 premio_apolice, uint64 cobertura_apolice, uint dt_vencimento_apolice, address seguradora1, uint16 percent1, address seguradora2, uint16 percent2, address seguradora3, uint16 percent3, bool sucesso, int cod_retorno, string descricao);
-    function incluir_apolice(string _codigo_apolice, uint64 _premio_apolice, uint64 _cobertura_apolice, uint _dt_vencimento_apolice, address _seguradora1, uint16 _percent1, address _seguradora2, uint16 _percent2, address _seguradora3, uint16 _percent3) {
+    //event ret_incluir_apolice(string codigo_apolice, uint64 premio_apolice, uint64 cobertura_apolice, uint dt_vencimento_apolice, uint numero_aditivo, uint16 tipo, uint16 percent_comissao, uint16 percent_desconto, address seguradora1, uint16 percent1, address seguradora2, uint16 percent2, address seguradora3, uint16 percent3, bool sucesso, int cod_retorno, string descricao);
+    event ret_incluir_apolice(string codigo_apolice, uint64 premio_apolice, uint64 cobertura_apolice, uint dt_vencimento_apolice, uint numero_aditivo, bool sucesso, int cod_retorno, string descricao);
+    function incluir_apolice(string _codigo_apolice, uint64 _premio_apolice, uint64 _valor_cobertura, uint _dt_vencimento_apolice, uint _numero_aditivo, uint16 _tipo, uint16 _percent_comissao, uint16 _percent_desconto, address _seguradora1, uint16 _percent1, address _seguradora2, uint16 _percent2, address _seguradora3, uint16 _percent3) {
         Apolice apolice_aux = apolices[_qtdeApolices];
 
         if (equal(_codigo_apolice, "")) {
-            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _cobertura_apolice, _dt_vencimento_apolice, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -10, "Codigo inválido");
+            //ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, _tipo, _percent_comissao, _percent_desconto, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -10, "Codigo inválido");
+            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, false, -10, "Codigo inválido");
         } else if (_premio_apolice == 0) {
-            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _cobertura_apolice, _dt_vencimento_apolice, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -20, "Premio inválido");
-        } else if (_cobertura_apolice == 0) {
-            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _cobertura_apolice, _dt_vencimento_apolice, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -30, "Cobertura inválida");
+            //ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, _tipo, _percent_comissao, _percent_desconto, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -20, "Premio inválido");
+            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, false, -20, "Premio inválido");
+        } else if (_valor_cobertura == 0) {
+            //ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, _tipo, _percent_comissao, _percent_desconto, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -30, "Cobertura inválida");
+            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, false, -30, "Cobertura inválida");
         } else if (_dt_vencimento_apolice < block.timestamp) {
-            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _cobertura_apolice, _dt_vencimento_apolice, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -40, "Data de vencimento inválida");
+            //ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, _tipo, _percent_comissao, _percent_desconto, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -40, "Data de vencimento inválida");
+            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, false, -40, "Data de vencimento inválida");
         } else if (_seguradora1 == 0) {
-            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _cobertura_apolice, _dt_vencimento_apolice, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -41, "Endereco da primeira coseguradora invalida");
+            //ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, _tipo, _percent_comissao, _percent_desconto, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -41, "Endereco da primeira coseguradora invalida");
+            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, false, -41, "Endereco da primeira coseguradora invalida");
         } else if (_percent1 == 0 || _percent1 > 99) {
-            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _cobertura_apolice, _dt_vencimento_apolice, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -42, "Percentual da primeira coseguradora invalido");
+            //ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, _tipo, _percent_comissao, _percent_desconto, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -42, "Percentual da primeira coseguradora invalido");
+            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, false, -42, "Percentual da primeira coseguradora invalido");
         } else if (_seguradora2 != 0 && (_percent2 == 0 || _percent2 > 99)) {
-            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _cobertura_apolice, _dt_vencimento_apolice, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -43, "Segunda coseguradora invalida");
+            //ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, _tipo, _percent_comissao, _percent_desconto, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -43, "Segunda coseguradora invalida");
+            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, false, -43, "Segunda coseguradora invalida");
         } else if (_seguradora3 != 0 && (_percent3 == 0 || _percent3 > 99)) {
-            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _cobertura_apolice, _dt_vencimento_apolice, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -44, "Terceira coseguradora invalida");
+            //ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, _tipo, _percent_comissao, _percent_desconto, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -44, "Terceira coseguradora invalida");
+            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, false, -44, "Terceira coseguradora invalida");
         } else if (_percent1 + _percent2 + _percent3 > 99) {
-            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _cobertura_apolice, _dt_vencimento_apolice, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -44, "Percentual das coseguradoras maior que 99");
+            //ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, _tipo, _percent_comissao, _percent_desconto, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -44, "Percentual das coseguradoras maior que 99");
+            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, false, -44, "Percentual das coseguradoras maior que 99");
+        } else if (_percent_comissao > 99) {
+            //ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, _tipo, _percent_comissao, _percent_desconto, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -44, "Percentual comissao maior que 99");
+            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, false, -44, "Percentual comissao maior que 99");
+        } else if (_percent_desconto > 99) {
+            //ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, _tipo, _percent_comissao, _percent_desconto, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, false, -44, "Percentual desconto maior que 99");
+            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, false, -44, "Percentual desconto maior que 99");
         } else {
             apolice_aux.codigo = _codigo_apolice;
             apolice_aux.premio = _premio_apolice;
-            apolice_aux.cobertura = _cobertura_apolice;
+            apolice_aux.valor_cobertura = _valor_cobertura;
             apolice_aux.dt_vencimento = _dt_vencimento_apolice;
             apolice_aux.owner = msg.sender;
+            apolice_aux.numero_aditivo = _numero_aditivo;
+            apolice_aux.tipo = _tipo;
+            apolice_aux.percent_comissao = _percent_comissao;
+            apolice_aux.percent_desconto = _percent_desconto;
+            apolice_aux.situacao_aprovacao = 0;
 
             apolice_aux.addr_seguradora.push(_seguradora1);
             apolice_aux.percent.push(_percent1);
             apolice_aux.autorizado.push(0);
-
+            apolice_aux.situacao_aprovacao = 1;
             if (_percent2 > 0) {
                 apolice_aux.addr_seguradora.push(_seguradora2);
                 apolice_aux.percent.push(_percent2);
                 apolice_aux.autorizado.push(0);
                 acordos[_seguradora2].index_apolice.push(_qtdeApolices);
+                apolice_aux.situacao_aprovacao++;
             }
 
             if (_percent3 > 0) {
@@ -70,14 +98,36 @@ contract Cosseguro {
                 apolice_aux.percent.push(_percent3);
                 apolice_aux.autorizado.push(0);
                 acordos[_seguradora3].index_apolice.push(_qtdeApolices);
+                apolice_aux.situacao_aprovacao++;
             }
 
-            //event ret_incluir_apolice(string codigo, uint64 premio, uint64 cobertura, uint dt_vencimento, int qtde_seguradoras, int index_array_apolice, int index_array_seguradoras, int index_array_acordo, bool sucesso, int cod_retorno, string descricao);
-            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _cobertura_apolice, _dt_vencimento_apolice, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, true, 0, "Apolice cadastrada com sucesso");
+            //ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, _tipo, _percent_comissao, _percent_desconto, _seguradora1, _percent1, _seguradora2, _percent2, _seguradora3, _percent3, true, 0, "Apolice cadastrada com sucesso");
+            ret_incluir_apolice(_codigo_apolice, _premio_apolice, _valor_cobertura, _dt_vencimento_apolice, _numero_aditivo, true, 0, "Apolice cadastrada com sucesso");
 
             _qtdeApolices = _qtdeApolices + 1;
         }
     }
+
+    event ret_alterar_situacao_apolice_para_assinada(uint index_apolice, string codigo_apolice, int8 situacao_aprovacao, bool sucesso, int cod_retorno, string descricao);
+    function alterar_situacao_apolice_para_assinada(uint _index_apolice) {
+        Apolice memory apolice_aux = apolices[_index_apolice];
+
+        if (apolice_aux.owner != msg.sender) {
+            ret_alterar_situacao_apolice_para_assinada(_index_apolice, apolice_aux.codigo, apolice_aux.situacao_aprovacao, false, -00, "Permissao invalida para alterar a apolice");
+        //} else if ((apolice_aux.addr_seguradora[0] != 0 && apolice_aux.autorizado[0] != 1) || (apolice_aux.addr_seguradora[1] != 0 && apolice_aux.autorizado[1] != 1) || (apolice_aux.addr_seguradora[2] != 0 && apolice_aux.autorizado[2] != 1)) {
+        //    ret_alterar_situacao_apolice_para_assinada(_index_apolice, apolice_aux.codigo, apolice_aux.situacao, false, -00, "Uma ou mais seguradoras não aceitaram o acordo");
+        //    apolices[_index_apolice].situacao = 8;
+        } else {
+            apolices[_index_apolice].assinado_cliente = true;
+
+            ret_alterar_situacao_apolice_para_assinada(_index_apolice, apolice_aux.codigo, apolice_aux.situacao_aprovacao, true, 00, "Situacao alterada com sucesso");
+        }
+    }
+
+    //////////////////////////////////////////////////////////////////
+    //function alterar_apolice
+    //  permitir somente se nenhuma seguradora já tiver aceito
+    //////////////////////////////////////////////////////////////////
 
     function consultar_apolice_seguradoras(uint _index_apolice) constant returns (address, uint, uint8, address, uint, uint8, address, uint, uint8) {
         Apolice memory apolice_aux = apolices[_index_apolice];
@@ -88,7 +138,7 @@ contract Cosseguro {
             return (apolice_aux.addr_seguradora[0], apolice_aux.percent[0], apolice_aux.autorizado[0], apolice_aux.addr_seguradora[1], apolice_aux.percent[1], apolice_aux.autorizado[1], 0, 0, 0);    
         } else  if (apolice_aux.addr_seguradora.length == 1 && apolice_aux.owner == msg.sender) {
             return (apolice_aux.addr_seguradora[0], apolice_aux.percent[0], apolice_aux.autorizado[0], 0, 0, 0, 0, 0, 0);    
-        } else if (apolice_aux.owner == msg.sender) {
+        } else if (apolice_aux.owner != msg.sender) {
             return (0, 0, 0, 0, 0, 0, 0, 0, 0);
         } else {
             for (uint iSeg = 0; iSeg < apolice_aux.addr_seguradora.length; iSeg++) {
@@ -107,14 +157,8 @@ contract Cosseguro {
 
     function consultar_apolice(uint _index_apolice) constant returns (string, uint64, uint64, uint) {
 
-        if (apolices[_index_apolice].addr_seguradora.length == 3 && apolices[_index_apolice].owner == msg.sender) {
-            return (apolices[_index_apolice].codigo, apolices[_index_apolice].premio, apolices[_index_apolice].cobertura, apolices[_index_apolice].dt_vencimento);    
-        } else if (apolices[_index_apolice].addr_seguradora.length == 2 && apolices[_index_apolice].owner == msg.sender) {
-            return (apolices[_index_apolice].codigo, apolices[_index_apolice].premio, apolices[_index_apolice].cobertura, apolices[_index_apolice].dt_vencimento);    
-        } else  if (apolices[_index_apolice].addr_seguradora.length == 1 && apolices[_index_apolice].owner == msg.sender) {
-            return (apolices[_index_apolice].codigo, apolices[_index_apolice].premio, apolices[_index_apolice].cobertura, apolices[_index_apolice].dt_vencimento);    
-        } else if (apolices[_index_apolice].owner == msg.sender) {
-            return (apolices[_index_apolice].codigo, apolices[_index_apolice].premio, apolices[_index_apolice].cobertura, apolices[_index_apolice].dt_vencimento);
+        if (apolices[_index_apolice].owner == msg.sender) {
+            return (apolices[_index_apolice].codigo, apolices[_index_apolice].premio, apolices[_index_apolice].valor_cobertura, apolices[_index_apolice].dt_vencimento);
         } else {
             for (uint iSeg = 0; iSeg < apolices[_index_apolice].addr_seguradora.length; iSeg++) {
                 if (apolices[_index_apolice].addr_seguradora[iSeg] == msg.sender) {
@@ -123,34 +167,31 @@ contract Cosseguro {
             }
 
             if (iSeg < apolices[_index_apolice].addr_seguradora.length) {
-                return (apolices[_index_apolice].codigo, apolices[_index_apolice].premio, apolices[_index_apolice].cobertura, apolices[_index_apolice].dt_vencimento);
+                return (apolices[_index_apolice].codigo, apolices[_index_apolice].premio, apolices[_index_apolice].valor_cobertura, apolices[_index_apolice].dt_vencimento);
             } else {
                 return ("", 0, 0, 0);
             }
         }
     }
 
-    /*
-    function consultar_apolice_seguradora(uint _index_apolice, uint _index_seguradora) constant returns (string, uint64, uint64, uint, address, uint16, bool) {
-        Apolice memory apolice_aux = apolices[_index_apolice];
-        
-        if (apolice_aux.owner != msg.sender) {
-            return ("", 0, 0, 0, 0, 0, false);
-        } else {
-            uint qtde_seguradoras = apolice_aux.addr_seguradora.length;
+    function consultar_apolice_detalhe(uint _index_apolice) constant returns (uint, uint16, uint16, uint16, int8) {
 
-            if (_index_seguradora >= apolice_aux.addr_seguradora.length) {
-                return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.cobertura, apolice_aux.dt_vencimento, 0, 0, false);
+        if (apolices[_index_apolice].owner == msg.sender) {
+            return (apolices[_index_apolice].numero_aditivo, apolices[_index_apolice].tipo, apolices[_index_apolice].percent_comissao, apolices[_index_apolice].percent_desconto, apolices[_index_apolice].situacao_aprovacao);
+        } else {
+            for (uint iSeg = 0; iSeg < apolices[_index_apolice].addr_seguradora.length; iSeg++) {
+                if (apolices[_index_apolice].addr_seguradora[iSeg] == msg.sender) {
+                    break;
+                }
+            }
+
+            if (iSeg < apolices[_index_apolice].addr_seguradora.length) {
+                return (apolices[_index_apolice].numero_aditivo, apolices[_index_apolice].tipo, apolices[_index_apolice].percent_comissao, apolices[_index_apolice].percent_desconto, apolices[_index_apolice].situacao_aprovacao);
             } else {
-                address addr_seguradora_aux = apolice_aux.addr_seguradora[_index_seguradora];
-                Acordo memory acordo_aux = acordos[addr_seguradora_aux];
-                uint index_acordo_aux =  0;
-                return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.cobertura, apolice_aux.dt_vencimento, addr_seguradora_aux, 0, false);
+                return (0, 0, 0, 0, 0);
             }
         }
     }
-    */
-
 	function contar_apolices() constant returns (uint) {
         return (_qtdeApolices);
     }
@@ -192,7 +233,7 @@ contract Cosseguro {
         */
         uint qtde_seguradoras = apolice_aux.addr_seguradora.length;
 
-        return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.cobertura, apolice_aux.dt_vencimento, qtde_seguradoras, apolice_aux.addr_seguradora[0], 0);
+        return (apolice_aux.codigo, apolice_aux.premio, apolice_aux.valor_cobertura, apolice_aux.dt_vencimento, qtde_seguradoras, apolice_aux.addr_seguradora[0], 0);
     }
     ///////////////////////////////////////////////////
     //fim apolices
@@ -208,26 +249,33 @@ contract Cosseguro {
         uint[] index_apolice;
     }
 
-    event ret_autorizar_acordo(uint index_apolice_cedido, bool sucesso, int cod_retorno, string descricao);
-    function autorizar_acordo(uint _index_apolice_cedido, uint8 _autorizado) {
+    event ret_autorizar_acordo(uint index_apolice_cedido, uint8 situacao_autorizacao, bool sucesso, int cod_retorno, string descricao);
+    function autorizar_acordo(uint _index_apolice_cedido, uint8 _situacao_autorizacao) {
+        // _situacao_autorizacao: 1 = autorizado; 2 = rejeitado;
         if (_index_apolice_cedido >= _qtdeApolices) {
-            ret_autorizar_acordo(_index_apolice_cedido, false, -90, "Index da apolice invalido");
+            ret_autorizar_acordo(_index_apolice_cedido, _situacao_autorizacao, false, -90, "Index da apolice invalido");
         } else {
-            Apolice memory apolice_aux = apolices[_index_apolice_cedido];
             
+            Apolice apolice_aux = apolices[_index_apolice_cedido];
+            
+            bool encontrada = false;
             for (uint iSeg = 0; iSeg < apolice_aux.addr_seguradora.length; iSeg++) {
                 if (apolice_aux.addr_seguradora[iSeg] == msg.sender) {
+                    encontrada = true;
                     break;
                 }
             }
 
-            if (iSeg < apolice_aux.addr_seguradora.length) {
-                apolices[_index_apolice_cedido].autorizado[iSeg] = _autorizado;
+            if (encontrada) {
+                apolice_aux.autorizado[iSeg] = _situacao_autorizacao;
+                
+                ret_autorizar_acordo(_index_apolice_cedido, _situacao_autorizacao, true, 0, "Acordo autorizado com sucesso");
             } else {
-                ret_autorizar_acordo(_index_apolice_cedido, false, -120, "Index da apolice invalido");
+                ret_autorizar_acordo(_index_apolice_cedido, _situacao_autorizacao, false, -120, "Index da apolice invalido");
             }
-            
         }
+
+        //apolice_aux.autorizado[0] = 1;
     }
 
     function consultar_acordo(uint _index_acordo) constant returns (uint) {

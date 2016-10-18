@@ -4,10 +4,10 @@ var config = [
 	{"URL_Web":"http://www.collateralblock.duckdns.org/"},
 	{"Nodes":[
 		{"name": "", "titulo": "", "URL": ""},
-		{"name": "n1", "titulo": "Banco A - Gest&atilde;o de Garantias", "tituloU": "Banco A - Gestão de Garantias", "URL":"http://ec2-52-50-42-100.eu-west-1.compute.amazonaws.com:80"},
-		{"name": "n2", "titulo": "Banco B - Gest&atilde;o de Garantias", "tituloU": "Banco B - Gestão de Garantias", "URL":"http://ec2-52-30-248-21.eu-west-1.compute.amazonaws.com:80"},
-		{"name": "n3", "titulo": "Banco C - Gest&atilde;o de Garantias", "tituloU": "Banco C - Gestão de Garantias", "URL":"http://ec2-54-194-150-243.eu-west-1.compute.amazonaws.com:80"},
-		{"name": "n4", "titulo": "Banco D - Gest&atilde;o de Garantias", "tituloU": "Banco D - Gestão de Garantias", "URL":"http://ec2-52-50-179-191.eu-west-1.compute.amazonaws.com:80"}
+		{"name": "n1", "titulo": "Banco A - Gest&atilde;o de Garantias", "tituloU": "Banco A - Gestão de Garantias", "URL":"http://52.30.248.21:80"},
+		{"name": "n2", "titulo": "Banco B - Gest&atilde;o de Garantias", "tituloU": "Banco B - Gestão de Garantias", "URL":"http://prodnode2.no-ip.org:80"},
+		{"name": "n3", "titulo": "Banco C - Gest&atilde;o de Garantias", "tituloU": "Banco C - Gestão de Garantias", "URL":"http://54.194.169.22:80"},
+		{"name": "n4", "titulo": "Banco D - Gest&atilde;o de Garantias", "tituloU": "Banco D - Gestão de Garantias", "URL":"http://prodnode4.no-ip.org:80"}
 	]},
 	{"Tipo_Bens":[
 		{"codigo":"",  "descricao":"", 					"descricaoU":"", 						"label":""},
