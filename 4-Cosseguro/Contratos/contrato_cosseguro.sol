@@ -174,10 +174,10 @@ contract Cosseguro {
         }
     }
 
-    function consultar_apolice_detalhe(uint _index_apolice) constant returns (uint, uint16, uint16, uint16, int8) {
+    function consultar_apolice_detalhe(uint _index_apolice) constant returns (uint, uint16, uint16, uint16, int8, bool) {
 
         if (apolices[_index_apolice].owner == msg.sender) {
-            return (apolices[_index_apolice].numero_aditivo, apolices[_index_apolice].tipo, apolices[_index_apolice].percent_comissao, apolices[_index_apolice].percent_desconto, apolices[_index_apolice].situacao_aprovacao);
+            return (apolices[_index_apolice].numero_aditivo, apolices[_index_apolice].tipo, apolices[_index_apolice].percent_comissao, apolices[_index_apolice].percent_desconto, apolices[_index_apolice].situacao_aprovacao, apolices[_index_apolice].assinado_cliente);
         } else {
             for (uint iSeg = 0; iSeg < apolices[_index_apolice].addr_seguradora.length; iSeg++) {
                 if (apolices[_index_apolice].addr_seguradora[iSeg] == msg.sender) {

@@ -451,7 +451,7 @@ function listarAcordos(quantidade, query_filtro) {
 			valor_cobertura_aux = formata_valor_descida(blockchain.acordos[i - 1].valor_cobertura, false);
 
 			index_acordo = i - 1;
-			acordos_html_conteudo = acordos_html_conteudo + '<div href="#" id="btn-alterar-acordo" index="' + index_acordo + '" class="ui-btn ui-corner-all ui-icon-carat-r ui-btn-icon-right ui-shadow ui-mini" style="width:85%; margin:10px auto;"><div style="display:inline-block; width:55%; text-align:left;">' + codigo_apolice_aux +'</div><div style="display:inline-block; width:5%; text-align:left;">R$</div><div style="display:inline-block; width:39%; padding-right:30px; text-align:right;">' + valor_cobertura_aux + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div></div>';
+			acordos_html_conteudo = acordos_html_conteudo + '<div href="#" id="btn-autorizacao-acordo" index="' + index_acordo + '" class="ui-btn ui-corner-all ui-icon-carat-r ui-btn-icon-right ui-shadow ui-mini" style="width:85%; margin:10px auto;"><div style="display:inline-block; width:55%; text-align:left;">' + codigo_apolice_aux +'</div><div style="display:inline-block; width:5%; text-align:left;">R$</div><div style="display:inline-block; width:39%; padding-right:30px; text-align:right;">' + valor_cobertura_aux + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div></div>';
 		}
 
 	}
@@ -485,25 +485,42 @@ function atualizar_links_acordo_pesq(titulo) {
 }
 
 function atualizar_links_acordo() {
-	$( "div#btn-alterar-acordo" ).each(function(index) {
+	$( "div#btn-autorizacao-acordo" ).each(function(index) {
 	//$( "img#btn-alterar-acordo" ).each(function(index) {
 		$(this).click(function() {
-			index_acordo = $(this).attr('index');
+			index_acordo = parseInt($(this).attr('index'));
 
 			//var codigo_acordo_aux = blockchain.acordos[index_acordo].codigo_acordo;
-			valor_aux = formata_valor_descida(blockchain.acordos[index_acordo].valor, false) ;// + ",00");
-			valor_atualizado_aux = formata_valor_descida(blockchain.acordos[index_acordo].valor_atualizado, true) ;// + ",00");
+			autorizacao_apolice_codigo = blockchain.acordos[index_acordo].codigo_apolice;
+			autorizacao_apolice_valor_premio = formata_valor_descida(blockchain.acordos[index_acordo].valor_premio, false);
+			autorizacao_apolice_valor_cobertura = formata_valor_descida(blockchain.acordos[index_acordo].valor_cobertura, false);
+			autorizacao_apolice_dt_vencimento = blockchain.acordos[index_acordo].dt_vencimento;
+			autorizacao_apolice_numero_aditivo = blockchain.acordos[index_acordo].numero_aditivo;
+			autorizacao_apolice_tipo = blockchain.acordos[index_acordo].tipo;
+			autorizacao_apolice_persent_comisao = blockchain.acordos[index_acordo].percent_comissao;
+			autorizacao_apolice_persent_desconto = blockchain.acordos[index_acordo].percent_desconto;
+			autorizacao_apolice_seg1 = blockchain.acordos[index_acordo].addr_seguradora;
+			autorizacao_apolice_seg1_percent = blockchain.acordos[index_acordo].percent;
+			index_apolice = blockchain.acordos[index_acordo].index_apolice;
 
-			$("input#valor_atualizado_acordo_alt").val(valor_atualizado_aux);
-			//$("span#codigo_acordo_alt").html(codigo_acordo_aux);
-			$("span#valor_acordo_alt").html(valor_aux);
+			$("#index_apolice").val(index_apolice);
+			$("#autorizacao_apolice_codigo").html(autorizacao_apolice_codigo);
+			$("#autorizacao_apolice_valor_premio").html(autorizacao_apolice_valor_premio);
+			$("#autorizacao_apolice_valor_cobertura").html(autorizacao_apolice_valor_cobertura);
+			$("#autorizacao_apolice_dt_vencimento").html(autorizacao_apolice_dt_vencimento);
+			$("#autorizacao_apolice_numero_aditivo").html(autorizacao_apolice_numero_aditivo);
+			$("#autorizacao_apolice_tipo").html(autorizacao_apolice_tipo);
+			$("#autorizacao_apolice_persent_comisao").html(autorizacao_apolice_persent_comisao);
+			$("#autorizacao_apolice_persent_desconto").html(autorizacao_apolice_persent_desconto);
+			$("#autorizacao_apolice_seg1").html(autorizacao_apolice_seg1);
+			$("#autorizacao_apolice_seg1_percent").html(autorizacao_apolice_seg1_percent);
 
 			$("#controle_lista_eventos").hide();
 			$("#sub-menu-grupo-acordo").show();
 			$("#sub-menu-grupo-apolice").hide();
 			$("#master-container").show();
 			$("#incluir_acordo").hide();
-			$("#alterar_acordo").show();
+			$("#autorizacao_acordo").show();
 			$("#consultar_acordo").hide();
 			$("#incluir_apolice").hide();
 			$("#alterar_apolice").hide();
@@ -654,7 +671,7 @@ function sub_menu_apolice_incluir_limpar() {
 	$("#sub-menu-grupo-apolice").show();
 	$("#master-container").hide();
 	$("#incluir_acordo").hide();
-	$("#alterar_acordo").hide();
+	$("#autorizacao_acordo").hide();
 	$("#consultar_acordo").hide();
 	$("#incluir_apolice").hide();
 	$("#alterar_apolice").hide();
@@ -676,7 +693,7 @@ function sub_menu_apolice_incluir_acordo_limpar() {
 	$("#sub-menu-grupo-apolice").show();
 	$("#master-container").hide();
 	$("#incluir_acordo").hide();
-	$("#alterar_acordo").hide();
+	$("#autorizacao_acordo").hide();
 	$("#consultar_acordo").hide();
 	$("#incluir_apolice").hide();
 	$("#alterar_apolice").hide();
@@ -750,7 +767,7 @@ function atualizar_links_apolice() {
 			$("#sub-menu-grupo-apolice").show();
 			$("#master-container").show();
 			$("#incluir_acordo").hide();
-			$("#alterar_acordo").hide();
+			$("#autorizacao_acordo").hide();
 			$("#consultar_acordo").hide();
 			$("#incluir_apolice").hide();
 			$("#alterar_apolice").hide();
@@ -816,7 +833,7 @@ function atualizar_links_apolice() {
 			$("#sub-menu-grupo-apolice").show();
 			$("#master-container").show();
 			$("#incluir_acordo").hide();
-			$("#alterar_acordo").hide();
+			$("#autorizacao_acordo").hide();
 			$("#consultar_acordo").hide();
 			$("#incluir_apolice").hide();
 			$("#alterar_apolice").show();
@@ -902,7 +919,7 @@ function inicializar_contrato() {
 		$("#sub-menu-grupo-controle").show();
 		$("#master-container").hide();
 		$("#incluir_acordo").hide();
-		$("#alterar_acordo").hide();
+		$("#autorizacao_acordo").hide();
 		$("#consultar_acordo").hide();
 		$("#incluir_apolice").hide();
 		$("#alterar_apolice").hide();
@@ -919,7 +936,7 @@ function inicializar_contrato() {
 		$("#sub-menu-grupo-apolice").hide();
 		$("#master-container").show();
 		$("#incluir_acordo").hide();
-		$("#alterar_acordo").hide();
+		$("#autorizacao_acordo").hide();
 		$("#consultar_acordo").hide();
 		$("#incluir_apolice").hide();
 		$("#alterar_apolice").hide();
@@ -941,7 +958,7 @@ function inicializar_contrato() {
 		$("#sub-menu-grupo-apolice").hide();
 		$("#master-container").show();
 		$("#incluir_acordo").hide();
-		$("#alterar_acordo").hide();
+		$("#autorizacao_acordo").hide();
 		$("#consultar_acordo").hide();
 		$("#incluir_apolice").hide();
 		$("#alterar_apolice").hide();
@@ -963,7 +980,7 @@ function inicializar_contrato() {
 		$("#sub-menu-grupo-apolice").hide();
 		$("#master-container").show();
 		$("#incluir_acordo").hide();
-		$("#alterar_acordo").hide();
+		$("#autorizacao_acordo").hide();
 		$("#consultar_acordo").hide();
 		$("#incluir_apolice").hide();
 		$("#alterar_apolice").hide();
@@ -980,7 +997,7 @@ function inicializar_contrato() {
 		$("#sub-menu-grupo-apolice").hide();
 		$("#master-container").hide();
 		$("#incluir_acordo").hide();
-		$("#alterar_acordo").hide();
+		$("#autorizacao_acordo").hide();
 		$("#consultar_acordo").hide();
 		$("#incluir_apolice").hide();
 		$("#alterar_apolice").hide();
@@ -1014,7 +1031,7 @@ function inicializar_contrato() {
 		$("#sub-menu-grupo-apolice").hide();
 		$("#master-container").show();
 		$("#incluir_acordo").hide();
-		$("#alterar_acordo").hide();
+		$("#autorizacao_acordo").hide();
 		$("#consultar_acordo").show();
 		$("#incluir_apolice").hide();
 		$("#alterar_apolice").hide();
@@ -1031,7 +1048,7 @@ function inicializar_contrato() {
 		$("#sub-menu-grupo-apolice").hide();
 		$("#master-container").show();
 		$("#incluir_acordo").show();
-		$("#alterar_acordo").hide();
+		$("#autorizacao_acordo").hide();
 		$("#consultar_acordo").hide();
 		$("#incluir_apolice").hide();
 		$("#alterar_apolice").hide();
@@ -1067,39 +1084,16 @@ function inicializar_contrato() {
 		*/
 	});
 
-	$( "#alterar_acordo_btn" ).click(function() {
+	$( "#autorizar_acordo_btn" ).click(function() {
+		var index_apolice_aux = parseInt($("#index_apolice").val().toString());
+		var _situacao_autorizacao = 1; // Autorizar;
+		autorizar_acordo(index_apolice_aux, _situacao_autorizacao);
+	});
 
-		var codigo_acordo_alt = $("#codigo_acordo_alt").html().toString();
-		//var codigo_acordo = node + " " + $("#codigo_acordo_alt").val().toString();
-		var valor_atualizado_acordo_alt = $("#valor_atualizado_acordo_alt").val().toString();
-
-		//if (valor_acordo.indexOf(",") == -1)
-		//	valor_acordo = valor_acordo + ",00";
-
-		if (!validacao_simples($("#valor_atualizado_acordo_alt"), "O valor atualizado &eacute; inv&aacute;lido"))
-			return;
-		
-		valor_atualizado_acordo_alt = formata_valor_subida(valor_atualizado_acordo_alt);
-
-		$("#codigo_acordo_alt").html("");
-		$("#valor_acordo_alt").html("");
-		$("#valor_atualizado_acordo_alt").val("");
-
-		var aux_valor = parseInt(valor_atualizado_acordo_alt)
-
-		/*
-		//cosseguro.incluir_acordo.sendTransaction('a', 0, {
-		cosseguro.alterar_acordo.sendTransaction(codigo_acordo_alt, aux_valor, {
-		from: web3.eth.coinbase, gas: config[3].GAS }, function(err, txHash) {
-				if (err != null) {
-					//alert("Erro: " + err.message);
-				} else {
-					arrTransacoes.push(txHash + "|false|Altera&ccedil;&atilde;o de opera&ccedil;&atilde;o|||" + codigo_acordo_alt.toString());
-					alert("Em andamento a minera&ccedil;&atilde;o da altera&ccedil;&atilde;o da opera&ccedil;&atilde;o");
-				}
-			}
-		);
-		*/
+	$( "#rejeitar_acordo_btn" ).click(function() {
+		var index_apolice_aux = parseInt($("#index_apolice").val().toString());
+		var _situacao_autorizacao = 2; // Rejeitar;
+		autorizar_acordo(index_apolice_aux, _situacao_autorizacao);
 	});
 
 	$( "#menu-apolice" ).click(function() {
@@ -1111,7 +1105,7 @@ function inicializar_contrato() {
 		$("#sub-menu-grupo-apolice").show();
 		$("#master-container").hide();
 		$("#incluir_acordo").hide();
-		$("#alterar_acordo").hide();
+		$("#autorizacao_acordo").hide();
 		$("#consultar_acordo").hide();
 		$("#incluir_apolice").hide();
 		$("#alterar_apolice").hide();
@@ -1145,7 +1139,7 @@ function inicializar_contrato() {
 		$("#sub-menu-grupo-apolice").show();
 		$("#master-container").show();
 		$("#incluir_acordo").hide();
-		$("#alterar_acordo").hide();
+		$("#autorizacao_acordo").hide();
 		$("#consultar_acordo").hide();
 		$("#incluir_apolice").hide();
 		$("#alterar_apolice").hide();
@@ -1177,7 +1171,7 @@ function inicializar_contrato() {
 		$("#sub-menu-grupo-apolice").show();
 		$("#master-container").show();
 		$("#incluir_acordo").hide();
-		$("#alterar_acordo").hide();
+		$("#autorizacao_acordo").hide();
 		$("#consultar_acordo").hide();
 		$("#incluir_apolice").show();
 		$("#alterar_apolice").hide();
@@ -1353,7 +1347,7 @@ function inicializar_contrato() {
 		$("#sub-menu-grupo-apolice").show();
 		$("#master-container").show();
 		$("#incluir_acordo").show();
-		$("#alterar_acordo").hide();
+		$("#autorizacao_acordo").hide();
 		$("#consultar_acordo").hide();
 		$("#incluir_apolice").hide();
 		$("#alterar_apolice").hide();
@@ -1482,6 +1476,34 @@ function inicializar_contrato() {
 
 	$("#page-app").show();
 }
+
+function autorizar_acordo(index_apolice_aux, _situacao_autorizacao) {
+	var _data = {};
+	_data.index_apolice = parseInt(index_apolice_aux);
+	_data.situacao_autorizacao = parseInt(_situacao_autorizacao);
+	
+	_data.usuario = usuario;
+	
+	//alert(_data + '\n' + this.id);
+	postAjax("/autorizar_acordo", 
+		_data, 
+		function(data) {
+			//$("#retorno_login").html(data);
+			if (data.sucesso) {
+				arrTransacoes.push(data.txHash + "|false|" + data.funcao + "|||" + codigo_apolice);
+				alert("Em andamento a minera&ccedil;&atilde;o da autorização ou rejeição do acordo");
+			} else {
+				if (data.loginError)
+					location.reload();
+				else
+					alert(data.msg);
+			}
+		}, function(errMsg) {
+			alert(errMsg);
+		});
+}
+
+
 
 function main() {
 	setTimeout(inicializar_contrato,1);

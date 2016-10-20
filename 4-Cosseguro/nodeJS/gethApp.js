@@ -1,6 +1,6 @@
 'use strict';
 
-const DEBUG_OFF_LINE = true;
+const DEBUG_OFF_LINE = false; //Pradrão = false;
 
 const Web3 = require('web3');
 var BigNumber = require('big-number');
@@ -746,10 +746,11 @@ cosseguro.ret_incluir_acordo(function(error, result){
 */
 
 app.post('/autorizar_acordo', urlencodedParser, function (req, res) {
-    var codigo_apolice = req.body.codigo_apolice;
+    var index_apolice = req.body.index_apolice;
+    var situacao_autorizacao = req.body.situacao_autorizacao;
     
     var retorno = {};
-    retorno.funcao = "Inclus&atilde;o de duplicata";
+    retorno.funcao = "Autorização da Duplicata";
     retorno.msg = "";
     retorno.msgTecnica = "";
     retorno.sucesso = true;
@@ -757,105 +758,57 @@ app.post('/autorizar_acordo', urlencodedParser, function (req, res) {
     retorno.retornoApresentado = false;
     retorno.sucesso_alt_blockchain = false;
     retorno.mensagem_blockchain = "";
-    retorno.dados_duplicata = {};
-    retorno.dados_duplicata.chave = chave_duplicata;
-    retorno.dados_duplicata.codigo_op = codigo_op;
-    retorno.dados_duplicata.cpf_cnpj_sacado = cpf_cnpj_sacado;
-    retorno.dados_duplicata.cnpj_emissor = cnpj_emissor;
-    retorno.dados_duplicata.valor_duplicata = valor_duplicata;
-    retorno.dados_duplicata.situacao_nova_duplicata = situacao_nova_duplicata;
+    retorno.index_apolice = index_apolice;
+    retorno.situacao_autorizacao = situacao_autorizacao;
     retorno.loginError = false;
     
     res.writeHead("200", {"Content-Type": "application/json"});
     
     if (!sessionValid(req.body.usuario, req)) {
         retorno.msg = "usuário inválido!";
-        retorno.msgTecnica = "/cadastrar_duplicata >> sessionValid -> req.body.usuario = " + req.body.usuario;
+        retorno.msgTecnica = "/autorizar_acordo >> sessionValid -> req.body.usuario = " + req.body.usuario;
         console.log(">>>>> " + retorno.msgTecnica);
         retorno.loginError = true;
         res.end(retorno);
         return false;
     }
 
-    if (!validacao_simples(codigo_op)) {
-        retorno.msg += "Código da opração: inválido\n";
+    if (!validacao_simples(index_apolice)) {
+        retorno.msg += "Index da apolice: inválida\n";
         retorno.sucesso = false;
     }
     
-    if (!validacao_simples(chave_duplicata)) {
-        retorno.msg += "Chave: inválida\n";
-        retorno.sucesso = false;
-    }
-    
-    if (!validacao_simples(req.body.cpf_cnpj_sacado)) {
-        retorno.msg += "CPF ou CNPJ da Sacado: inválido\n";
-        retorno.sucesso = false;
-    }
-        
-    if (!validacao_simples(req.body.cnpj_emissor)) {
-        retorno.msg += "CNPJ do emissor: inválido\n";
-        retorno.sucesso = false;
-    }
-    
-    if (!validacao_simples(req.body.valor_duplicata)) {
-        retorno.msg += "Valor: inválido\n";
+    if (!validacao_simples(situacao_autorizacao)) {
+        retorno.msg += "Situação da Autorização: inválida\n";
         retorno.sucesso = false;
     }
 
-    if (situacao_nova_duplicata.trim().length == 0) {
-        retorno.msg += "Situacao da nova duplicata: inválida\n";
-        retorno.sucesso = false;
-    }
+    console.log(">>>> autorizar_acordo >> ponto 2");
     
-    if (!retorno.sucesso) {
-        retorno.msg = "Verifique o(s) erro(s) abaixo:\n" + retorno.msg;
-        res.end(JSON.stringify(retorno));
-        console.log(">>>> cadastrar_duplicata >> ponto 1.5 >> retorno.msg = " + retorno.msg);
-        return;
-    }
-
-    console.log(">>>> cadastrar_duplicata >> ponto 2");
-    
-    var chave_duplicata_big = new BigNumber(chave_duplicata, 10);
-    var cnpj_emissor_big = new BigNumber(cnpj_emissor, 10);
-    var cpf_cnpj_sacado_big = new BigNumber(cpf_cnpj_sacado, 10);
-
-    valor_duplicata = formata_valor_subida(valor_duplicata);
-    
-    cosseguro.incluir_duplicata.sendTransaction(chave_duplicata_big, cnpj_emissor_big, cpf_cnpj_sacado_big, valor_duplicata, situacao_nova_duplicata, codigo_op, {
+    cosseguro.autorizar_acordo.sendTransaction(codigo_apolice, situacao_autorizacao, {
 		from: web3_node1.eth.coinbase, gas: 3500000 }, function(err, txHash) {
             if (err != null) {
-                retorno.msg = "Erro ao tentar incluir uma duplicata";
-                retorno.msgTecnica = "cosseguro.incluir_duplicata.sendTransaction => " + err;
+                retorno.msg = "Erro ao tentar autorizar ou rejeitar o acordo";
+                retorno.msgTecnica = "cosseguro.autorizar_acordo.sendTransaction => " + err;
                 retorno.sucesso = false;
                 retorno.txHash = txHash;
                 retorno.retornoApresentado = false;
                 retorno.sucesso_alt_blockchain = "";
                 retorno.mensagem_blockchain = "";
-                retorno.dados_duplicata = {};
-                retorno.dados_duplicata.chave = chave_duplicata;
-                retorno.dados_duplicata.codigo_op = codigo_op;
-                retorno.dados_duplicata.cpf_cnpj_sacado = cpf_cnpj_sacado;
-                retorno.dados_duplicata.cnpj_emissor = cnpj_emissor;
-                retorno.dados_duplicata.valor_duplicata = valor_duplicata;
-                retorno.dados_duplicata.situacao_nova_duplicata = situacao_nova_duplicata;
+                retorno.index_apolice = index_apolice;
+                retorno.situacao_autorizacao = situacao_autorizacao;
 
                 res.end(retorno);
             } else {
-                retorno.msg = "Em andamento a minera&ccedil;&atilde;o da nova duplicata";
-                console.log(">>>> cadastrar_operacao >> retorno.msg: " + retorno.msg);
+                retorno.msg = "Em andamento a minera&ccedil;&atilde;o da autorização ou rejeição do acordo";
+                console.log(">>>> autorizar_acordo >> retorno.msg: " + retorno.msg);
                 retorno.sucesso = true;
                 retorno.txHash = txHash;
                 retorno.retornoApresentado = false;
                 retorno.sucesso_alt_blockchain = "";
                 retorno.mensagem_blockchain = "";
-                retorno.dados_duplicata = {};
-                retorno.dados_duplicata.chave = chave_duplicata;
-                retorno.dados_duplicata.codigo_op = codigo_op;
-                retorno.dados_duplicata.cpf_cnpj_sacado = cpf_cnpj_sacado;
-                retorno.dados_duplicata.cnpj_emissor = cnpj_emissor;
-                retorno.dados_duplicata.valor_duplicata = valor_duplicata;
-                retorno.dados_duplicata.situacao_nova_duplicata = situacao_nova_duplicata;
+                retorno.index_apolice = index_apolice;
+                retorno.situacao_autorizacao = situacao_autorizacao;
 
                 txHashs[txHash] = users[req.sessionID].socketId; //utilizado para que o eventoi possa dar o retorno para o client correto.
                 
@@ -865,7 +818,7 @@ app.post('/autorizar_acordo', urlencodedParser, function (req, res) {
     );
 
     sio.sockets.connected[users[req.sessionID].socketId].emit('notification', mensagem);
-    console.log('>>>>> app.post >> /cadastrar_duplicata');
+    console.log('>>>>> app.post >> /autorizar_acordo');
 });
 
 if (!DEBUG_OFF_LINE) {
@@ -945,6 +898,7 @@ app.post('/consultar_blockchain', urlencodedParser, function (req, res) {
     var total_apolices = 0;
     var arr_apolices = [];
     var arr_apolices_seguradoras = [];
+    var arr_apolices_detalhes = [];
     var total_acordos = 0;
     var arr_acordos = [];
     var arr_acordos_seguradoras = [];
@@ -955,12 +909,17 @@ app.post('/consultar_blockchain', urlencodedParser, function (req, res) {
     
         for (var iA = 0; iA < total_apolices; iA++) {
             arr_apolices[iA] = cosseguro.consultar_apolice(iA);
-            console.log('>>>>> app.post >> /consultar_blockchain >> ponto 4 >> apolices['+ iA +'] = ' + JSON.stringify(arr_apolices[iA]));
+            console.log('>>>>> app.post >> /consultar_blockchain >> ponto 4.1 >> apolices['+ iA +'] = ' + JSON.stringify(arr_apolices[iA]));
         }
 
         for (var iA = 0; iA < total_apolices; iA++) {
             arr_apolices_seguradoras[iA] = cosseguro.consultar_apolice_seguradoras(iA);
-            console.log('>>>>> app.post >> /consultar_blockchain >> ponto 4 >> apolices['+ iA +'] = ' + JSON.stringify(arr_apolices_seguradoras[iA]));
+            console.log('>>>>> app.post >> /consultar_blockchain >> ponto 4.2 >> apolices['+ iA +'] = ' + JSON.stringify(arr_apolices_seguradoras[iA]));
+        }
+
+        for (var iA = 0; iA < total_apolices; iA++) {
+            arr_apolices_detalhes[iA] = cosseguro.consultar_apolice_detalhe(iA);
+            console.log('>>>>> app.post >> /consultar_blockchain >> ponto 4.3 >> apolices['+ iA +'] = ' + JSON.stringify(arr_apolices_detalhes[iA]));
         }
         console.log('>>>>> app.post >> /consultar_blockchain >> ponto 5');
 
@@ -983,6 +942,7 @@ app.post('/consultar_blockchain', urlencodedParser, function (req, res) {
         json_aux += '"apolices":[';
         var arr_aux_acordo = [];
         var arr_aux_apolice = [];
+        var arr_aux_apolice_detalhe = [];
 
         var virgula_acordo = '';
         var virgula_apolice = '';
@@ -990,7 +950,9 @@ app.post('/consultar_blockchain', urlencodedParser, function (req, res) {
         for (var iApolices=0; iApolices < arr_apolices.length; iApolices++) {
             console.log('>>>>> app.post >> /consultar_blockchain >> ponto de montagem 1 >> iApolices = ' + iApolices);
             var dados_apolice = arr_apolices[iApolices];
+            var dados_apolice_detalhe = arr_apolices_detalhes[iApolices];
             arr_aux_apolice = dados_apolice.toString().split(",");
+            arr_aux_apolice_detalhe = dados_apolice_detalhe.toString().split(",");
 
             console.log('>>>>> app.post >> /consultar_blockchain >> ponto de montagem 2 >> dados_apolice = ' + JSON.stringify(dados_apolice));
 
@@ -998,16 +960,27 @@ app.post('/consultar_blockchain', urlencodedParser, function (req, res) {
             var valor_premio = arr_aux_apolice[1];
             var valor_cobertura = arr_aux_apolice[2];
             var dt_vencimento = new Date(parseInt(arr_aux_apolice[3].toString()));
-
-
+            var numero_aditivo = arr_aux_apolice_detalhe[0];
+            var tipo = arr_aux_apolice_detalhe[1];
+            var percent_comissao = arr_aux_apolice_detalhe[2];
+            var percent_desconto = arr_aux_apolice_detalhe[3];
+            var situacao_aprovacao = arr_aux_apolice_detalhe[4];
+            var assinado_cliente = arr_aux_apolice_detalhe[5];
 
             json_aux += virgula_apolice;
             json_aux += '{';
+
             json_aux += '"index_apolice":"' + iApolices + '",';
             json_aux += '"codigo_apolice":"' + codigo_op_aux + '",';
             json_aux += '"valor_premio":"' + valor_premio + '",';
             json_aux += '"valor_cobertura":"' + valor_cobertura + '",';
             json_aux += '"dt_vencimento":"' + formataData(dt_vencimento) + '",';
+            json_aux += '"numero_aditivo":"' + numero_aditivo + '",';
+            json_aux += '"tipo":"' + tipo + '",';
+            json_aux += '"percent_comissao":' + percent_comissao + ',';
+            json_aux += '"percent_desconto":' + percent_desconto + ',';
+            json_aux += '"situacao_aprovacao":' + situacao_aprovacao + ',';  //quando for maior que 0 ainda há seguradoras que não aprovaram; quando for zero todas aceitaram; quando for negativo alguma cosseguradora não aceitou;
+            json_aux += '"assinado_cliente":' + assinado_cliente + ',';
 
             json_aux += '"seguradoras":['; // cosseguradoras da apolice (cedido)
 
@@ -1051,7 +1024,7 @@ app.post('/consultar_blockchain', urlencodedParser, function (req, res) {
                 json_aux += ',{';
                 json_aux += '"index_seguradora":"' + 3 + '",';
                 json_aux += '"addr_seguradora":"' + addr_seguradora + '",';
-                json_aux += '"percent":"' + percent + '"';
+                json_aux += '"percent":"' + percent + '",';
                 json_aux += '"autorizado":"' + autorizado + '"';
                 if (autorizado != "Autorizado") {
                     todas_autorizadas = false;
@@ -1091,12 +1064,20 @@ app.post('/consultar_blockchain', urlencodedParser, function (req, res) {
                 //////////////////////////////////////////////////////
                 json_aux += virgula_acordo;
                 json_aux += '{';
+
+                    json_aux += '"index_apolice":1,';
                 json_aux += '"codigo_apolice":"' + codigo_op_aux + '",';
                 json_aux += '"valor_premio":"' + valor_premio + '",';
                 json_aux += '"valor_cobertura":"' + valor_cobertura + '",';
                 json_aux += '"dt_vencimento":"' + formataData(dt_vencimento) + '",';
                 json_aux += '"addr_seguradora":"' + addr_seguradora + '",';
                 json_aux += '"percent":"' + percent + '"';
+                    json_aux += '"numero_aditivo":"0000000000002",';
+                    json_aux += '"tipo":"02",';
+                    json_aux += '"percent_comissao":2,';
+                    json_aux += '"percent_desconto":3,';
+                    json_aux += '"situacao_aprovacao":1,';  //quando for maior que 0 ainda há seguradoras que não aprovaram; quando for zero todas aceitaram; quando for negativo alguma cosseguradora não aceitou;
+                    json_aux += '"assinado_cliente":false,';
                 json_aux += '"autorizado":"' + autorizado + '"';
                 json_aux += '}';
                 virgula_acordo = ',';
@@ -1233,10 +1214,15 @@ app.post('/consultar_blockchain', urlencodedParser, function (req, res) {
 
             json_aux += '"acordos":['; // acordos que a seguradora participa como cosseguradora (aceito)
                 json_aux += '{';
+                    json_aux += '"index_apolice":0,';
                     json_aux += '"codigo_apolice":"AP_Cosseg1",';
                     json_aux += '"valor_premio":100000,';
                     json_aux += '"valor_cobertura":900000000,';
                     json_aux += '"dt_vencimento":"31/01/2017",';
+                    json_aux += '"numero_aditivo":"0000000000001",';
+                    json_aux += '"tipo":"01",';
+                    json_aux += '"percent_comissao":1,';
+                    json_aux += '"percent_desconto":2,';
                     json_aux += '"addr_seguradora":"addr_2928498723498723498723491",';
                     json_aux += '"percent":"10",';
                     json_aux += '"autorizado":true';
@@ -1247,6 +1233,10 @@ app.post('/consultar_blockchain', urlencodedParser, function (req, res) {
                     json_aux += '"valor_premio":200000,';
                     json_aux += '"valor_cobertura":800000000,';
                     json_aux += '"dt_vencimento":"31/02/2017",';
+                    json_aux += '"numero_aditivo":"0000000000002",';
+                    json_aux += '"tipo":"02",';
+                    json_aux += '"percent_comissao":2,';
+                    json_aux += '"percent_desconto":3,';
                     json_aux += '"addr_seguradora":"addr_2928498723498723498723492",';
                     json_aux += '"percent":"20",';
                     json_aux += '"autorizado":false';
@@ -1257,6 +1247,10 @@ app.post('/consultar_blockchain', urlencodedParser, function (req, res) {
                     json_aux += '"valor_premio":300000,';
                     json_aux += '"valor_cobertura":700000000,';
                     json_aux += '"dt_vencimento":"31/03/2017",';
+                    json_aux += '"numero_aditivo":"0000000000003",';
+                    json_aux += '"tipo":"03",';
+                    json_aux += '"percent_comissao":3,';
+                    json_aux += '"percent_desconto":4,';
                     json_aux += '"addr_seguradora":"addr_2928498723498723498723493",';
                     json_aux += '"percent":"30",';
                     json_aux += '"autorizado":true';
