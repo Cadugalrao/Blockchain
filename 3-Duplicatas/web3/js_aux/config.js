@@ -4,10 +4,14 @@ var config = [
 	{"URL_Web":"http://collateralblock.duckdns.org/"},
 	{"Nodes":[
 		{"name": "", "titulo": "", "URL": ""},
-		{"name": "Instituição A", "titulo": "Institui&ccedil;&atilde;o A - Gest&atilde;o de Duplicatas", "tituloU": "Instituição A - Gestão de Duplicatas", "URL":"http://ec2-52-50-42-100.eu-west-1.compute.amazonaws.com:80"},
-		{"name": "Instituição B", "titulo": "Institui&ccedil;&atilde;o B - Gest&atilde;o de Duplicatas", "tituloU": "Instituição B - Gestão de Duplicatas", "URL":"http://ec2-52-30-248-21.eu-west-1.compute.amazonaws.com:80"},
-		{"name": "Instituição C", "titulo": "Institui&ccedil;&atilde;o C - Gest&atilde;o de Duplicatas", "tituloU": "Instituição C - Gestão de Duplicatas", "URL":"http://ec2-54-194-150-243.eu-west-1.compute.amazonaws.com:80"},
-		{"name": "Instituição D", "titulo": "Institui&ccedil;&atilde;o D - Gest&atilde;o de Duplicatas", "tituloU": "Instituição D - Gestão de Duplicatas", "URL":"http://ec2-52-50-179-191.eu-west-1.compute.amazonaws.com:80"}
+		{"name": "Instituição A", "titulo": "Institui&ccedil;&atilde;o A - Gest&atilde;o de Duplicatas", "tituloU": "Instituição A - Gestão de Duplicatas", "URL":"http://prodnode4.no-ip.org:8545"},
+		{"name": "Instituição B", "titulo": "Institui&ccedil;&atilde;o B - Gest&atilde;o de Duplicatas", "tituloU": "Instituição B - Gestão de Duplicatas", "URL":"http://prodnode4.no-ip.org:8545"},
+		{"name": "Instituição C", "titulo": "Institui&ccedil;&atilde;o C - Gest&atilde;o de Duplicatas", "tituloU": "Instituição C - Gestão de Duplicatas", "URL":"http://prodnode4.no-ip.org:8545"},
+		{"name": "Instituição D", "titulo": "Institui&ccedil;&atilde;o D - Gest&atilde;o de Duplicatas", "tituloU": "Instituição D - Gestão de Duplicatas", "URL":"http://prodnode4.no-ip.org:8545"}
+		//{"name": "Instituição A", "titulo": "Institui&ccedil;&atilde;o A - Gest&atilde;o de Duplicatas", "tituloU": "Instituição A - Gestão de Duplicatas", "URL":"http://ec2-52-50-42-100.eu-west-1.compute.amazonaws.com:80"},
+		//{"name": "Instituição B", "titulo": "Institui&ccedil;&atilde;o B - Gest&atilde;o de Duplicatas", "tituloU": "Instituição B - Gestão de Duplicatas", "URL":"http://ec2-52-30-248-21.eu-west-1.compute.amazonaws.com:80"},
+		//{"name": "Instituição C", "titulo": "Institui&ccedil;&atilde;o C - Gest&atilde;o de Duplicatas", "tituloU": "Instituição C - Gestão de Duplicatas", "URL":"http://ec2-54-194-150-243.eu-west-1.compute.amazonaws.com:80"},
+		//{"name": "Instituição D", "titulo": "Institui&ccedil;&atilde;o D - Gest&atilde;o de Duplicatas", "tituloU": "Instituição D - Gestão de Duplicatas", "URL":"http://ec2-52-50-179-191.eu-west-1.compute.amazonaws.com:80"}
 	]},
 	{"Nodes_Local":[
 		{"name": "", "titulo": "", "URL": ""},

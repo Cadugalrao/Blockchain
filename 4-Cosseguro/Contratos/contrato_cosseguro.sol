@@ -139,8 +139,6 @@ contract Cosseguro {
         } else  if (apolice_aux.addr_seguradora.length == 1 && apolice_aux.owner == msg.sender) {
             return (apolice_aux.addr_seguradora[0], apolice_aux.percent[0], apolice_aux.autorizado[0], 0, 0, 0, 0, 0, 0);    
         } else if (apolice_aux.owner != msg.sender) {
-            return (0, 0, 0, 0, 0, 0, 0, 0, 0);
-        } else {
             for (uint iSeg = 0; iSeg < apolice_aux.addr_seguradora.length; iSeg++) {
                 if (apolice_aux.addr_seguradora[iSeg] == msg.sender) {
                     break;
@@ -186,9 +184,9 @@ contract Cosseguro {
             }
 
             if (iSeg < apolices[_index_apolice].addr_seguradora.length) {
-                return (apolices[_index_apolice].numero_aditivo, apolices[_index_apolice].tipo, apolices[_index_apolice].percent_comissao, apolices[_index_apolice].percent_desconto, apolices[_index_apolice].situacao_aprovacao);
+                return (apolices[_index_apolice].numero_aditivo, apolices[_index_apolice].tipo, apolices[_index_apolice].percent_comissao, apolices[_index_apolice].percent_desconto, apolices[_index_apolice].situacao_aprovacao, apolices[_index_apolice].assinado_cliente);
             } else {
-                return (0, 0, 0, 0, 0);
+                return (0, 0, 0, 0, 0, false);
             }
         }
     }

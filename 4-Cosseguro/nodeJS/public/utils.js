@@ -572,6 +572,7 @@ function listarapolices(quantidade, query_apolice, retornar_index) {
 	{
 		index_apolice = blockchain.apolices[iApolices-1].index_apolice;
 		codigo_apolice = blockchain.apolices[iApolices-1].codigo_apolice;
+
 		valor_premio = blockchain.apolices[iApolices-1].valor_premio;
 		valor_cobertura = blockchain.apolices[iApolices-1].valor_cobertura;
 		dt_vencimento = blockchain.apolices[iApolices-1].dt_vencimento;
@@ -589,7 +590,7 @@ function listarapolices(quantidade, query_apolice, retornar_index) {
 			exibir = true;
 		}
 
-		if (exibir) {
+		if (exibir && codigo_apolice.toString().trim().length > 0) {
 			//total_loops_acordo = blockchain.apolices[iApolices-1].acordos.length;
 
 			//for (var iAcordos=total_loops_acordo; iAcordos > 0; iAcordos--) {
@@ -1268,7 +1269,7 @@ function inicializar_contrato() {
 		if (!validacao_simples($("#cad_apolice_persent_desconto"), "cad_apolice_persent_desconto é inválido"))
 			return;
 
-		var seg1 = formata_numero_subida($("#cad_apolice_seg1").val().toString());
+		var seg1 = $("#cad_apolice_seg1").val().toString();
 		if (!validacao_simples($("#cad_apolice_seg1"), "cad_apolice_seg1 é inválido"))
 			return;
 
@@ -1276,7 +1277,7 @@ function inicializar_contrato() {
 		if (!validacao_simples($("#cad_apolice_seg1_percent"), "cad_apolice_seg1_percent é inválido"))
 			return;
 		
-		var seg2 = formata_numero_subida($("#cad_apolice_seg2").val().toString());
+		var seg2 = $("#cad_apolice_seg2").val().toString();
 		var seg2_percent = formata_numero_subida($("#cad_apolice_seg2_percent").val().toString());
 
 		if (seg2.trim().length > 0 || seg2_percent.trim().length > 0) {
@@ -1291,7 +1292,7 @@ function inicializar_contrato() {
 		}
 
 		
-		var seg3 = formata_numero_subida($("#cad_apolice_seg3").val().toString());
+		var seg3 = $("#cad_apolice_seg3").val().toString();
 		var seg3_percent = formata_numero_subida($("#cad_apolice_seg3_percent").val().toString());
 		
 		sub_menu_apolice_incluir_limpar();
@@ -1308,11 +1309,11 @@ function inicializar_contrato() {
 		_data.persent_comisao = parseInt(persent_comisao);
 		_data.persent_desconto = parseInt(persent_desconto);
 
-		_data.seg1_addr = parseInt(seg1);
+		_data.seg1_addr = seg1;
 		_data.seg1_persent = parseInt(seg1_percent);
-		_data.seg2_addr = parseInt(seg2);
+		_data.seg2_addr = seg2;
 		_data.seg2_persent = parseInt(seg2_percent);
-		_data.seg3_addr = parseInt(seg3);
+		_data.seg3_addr = seg3;
 		_data.seg3_persent = parseInt(seg3_percent);
 		
 		_data.usuario = usuario;
@@ -1490,7 +1491,7 @@ function autorizar_acordo(index_apolice_aux, _situacao_autorizacao) {
 		function(data) {
 			//$("#retorno_login").html(data);
 			if (data.sucesso) {
-				arrTransacoes.push(data.txHash + "|false|" + data.funcao + "|||" + codigo_apolice);
+				arrTransacoes.push(data.txHash + "|false|" + data.funcao + "|||" + index_apolice_aux);
 				alert("Em andamento a minera&ccedil;&atilde;o da autorização ou rejeição do acordo");
 			} else {
 				if (data.loginError)
